@@ -1,5 +1,7 @@
 # OneSearch 🔍🖼️
 
+**Live demo:** https://onesearch-lakshaymehra-pixels-projects.vercel.app
+
 **A meta image search engine** — search multiple free stock-photo platforms (Openverse, Unsplash, Pexels, Pixabay) from a single search bar, with unified filters and a Pinterest-style masonry grid.
 
 **Works out of the box** — Openverse needs no API key, so you can run the app and search immediately. Add free keys for the other sources when you want more results.
@@ -141,6 +143,17 @@ OneSearch does **not** host or redistribute any images. It queries each platform
 - React 18
 - Plain CSS (no framework — masonry via CSS columns)
 - Official REST APIs: Unsplash, Pexels, Pixabay
+
+## ☁️ Deployment
+
+Deployed on [Vercel](https://vercel.com). To deploy your own:
+
+```bash
+npx vercel link
+npx vercel env add UNSPLASH_ACCESS_KEY production
+npx vercel env add PIXABAY_API_KEY production
+npx vercel --prod
+```
 
 ## 📄 License
 
