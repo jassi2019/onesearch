@@ -10,7 +10,8 @@
 
 ## ✨ Features
 
-- **Unified search** — one query fans out to Unsplash, Pexels and Pixabay in parallel
+- **Unified search** — one query fans out to Openverse, Unsplash, Pexels, Pixabay and Pinterest in parallel
+- **Voice search** — tap the mic and speak your query (Web Speech API, Chrome/Edge/Safari)
 - **Source toggles** — include/exclude any platform with one click
 - **Filters** — orientation (landscape / portrait / square) and dominant color, mapped to each provider's native API filters
 - **Interleaved results** — results from all sources are mixed fairly so no single platform dominates the grid
@@ -64,6 +65,7 @@ npm install
 | Unsplash | [unsplash.com/developers](https://unsplash.com/developers) | 50 req/hour (demo) |
 | Pexels | [pexels.com/api](https://www.pexels.com/api/) | 200 req/hour, 20k/month |
 | Pixabay | [pixabay.com/api/docs](https://pixabay.com/api/docs/) | 100 req/minute |
+| Pinterest | [developers.pinterest.com](https://developers.pinterest.com) | OAuth token required — Pinterest has no keyless/public search API; create an app and request trial access |
 
 ### 3. Configure environment
 
@@ -77,6 +79,7 @@ Fill in your keys:
 UNSPLASH_ACCESS_KEY=your_key_here
 PEXELS_API_KEY=your_key_here
 PIXABAY_API_KEY=your_key_here
+PINTEREST_ACCESS_TOKEN=your_oauth_token_here
 ```
 
 You can start with **zero** keys (Openverse works without one) — sources without a key are automatically disabled.

@@ -89,6 +89,30 @@ a {
   background: var(--accent);
 }
 
+.search-bar .mic {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
+  padding: 0 16px;
+}
+
+.search-bar .mic:hover {
+  background: var(--panel);
+  border-color: var(--accent);
+}
+
+.search-bar .mic.listening {
+  border-color: #ff5a6e;
+  color: #ff5a6e;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 90, 110, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 90, 110, 0); }
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -193,6 +217,7 @@ a {
 .badge.unsplash { background: #1d2538; color: #8fb0ff; }
 .badge.pexels { background: #16301f; color: #7ddfa0; }
 .badge.pixabay { background: #32221a; color: #ffb27d; }
+.badge.pinterest { background: #381d22; color: #ff8fa0; }
 
 .load-more {
   display: block;

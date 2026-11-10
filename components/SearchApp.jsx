@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import ImageGrid from "./ImageGrid";
 
-const SOURCES = ["openverse", "unsplash", "pexels", "pixabay"];
+const SOURCES = ["openverse", "unsplash", "pexels", "pixabay", "pinterest"];
 const ORIENTATIONS = ["any", "landscape", "portrait", "square"];
 const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "white", "gray"];
 
@@ -17,6 +17,14 @@ export default function SearchApp() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) setVoiceSupported(true);
+  }, []);
 
   const toggleSource = (s) => {
     setActiveSources((prev) =>
@@ -25,8 +33,8 @@ export default function SearchApp() {
   };
 
   const runSearch = useCallback(
-    async (nextPage = 1) => {
-      const q = query.trim();
+    async (nextPage = 1, overrideQuery) => {
+      const q = (overrideQuery ?? query).trim();
       if (!q || !activeSources.length) return;
       setLoading(true);
       try {
@@ -55,6 +63,36 @@ export default function SearchApp() {
     [query, activeSources, orientation, color]
   );
 
+  const startVoiceSearch = useCallback(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
+    const rec = new SR();
+    rec.lang = navigator.language || "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = () => setListening(true);
+    rec.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setQuery(transcript);
+      runSearch(1, transcript);
+    };
+    rec.onerror = () => setListening(false);
+    rec.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = rec;
+    rec.start();
+  }, [runSearch]);
+
   const disabledSources = sourceStats.filter((s) => !s.enabled).map((s) => s.name);
 
   return (
@@ -72,6 +110,17 @@ export default function SearchApp() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        {voiceSupported && (
+          <button
+            type="button"
+            className={`mic ${listening ? "listening" : ""}`}
+            onClick={startVoiceSearch}
+            title={listening ? "Listening… tap to stop" : "Search by voice"}
+            aria-label="Search by voice"
+          >
+            {listening ? "●" : "🎤"}
+          </button>
+        )}
         <button type="submit" disabled={loading}>
           {loading ? "…" : "Search"}
         </button>
