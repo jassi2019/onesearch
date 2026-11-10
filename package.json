@@ -1,0 +1,16 @@
+{
+  "name": "onesearch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Meta image search engine — search Unsplash, Pexels and Pixabay from one place",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.33",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}
