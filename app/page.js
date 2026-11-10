@@ -7,7 +7,7 @@ export default function Home() {
         <h1>
           One<span>Search</span>
         </h1>
-        <p>Search Unsplash, Pexels and Pixabay — one query, every platform.</p>
+        <p>Search Openverse, Unsplash, Pexels and Pixabay — one query, every platform.</p>
       </div>
       <div className="container">
         <SearchApp />

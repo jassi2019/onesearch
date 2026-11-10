@@ -1,6 +1,8 @@
 # OneSearch 🔍🖼️
 
-**A meta image search engine** — search multiple free stock-photo platforms (Unsplash, Pexels, Pixabay) from a single search bar, with unified filters and a Pinterest-style masonry grid.
+**A meta image search engine** — search multiple free stock-photo platforms (Openverse, Unsplash, Pexels, Pixabay) from a single search bar, with unified filters and a Pinterest-style masonry grid.
+
+**Works out of the box** — Openverse needs no API key, so you can run the app and search immediately. Add free keys for the other sources when you want more results.
 
 > One query → every platform. No more juggling 5 browser tabs to find the right image.
 
@@ -56,6 +58,7 @@ npm install
 
 | Provider | Sign up at | Free tier |
 |----------|-----------|-----------|
+| Openverse | **No key needed** | ~20 req/min anonymous |
 | Unsplash | [unsplash.com/developers](https://unsplash.com/developers) | 50 req/hour (demo) |
 | Pexels | [pexels.com/api](https://www.pexels.com/api/) | 200 req/hour, 20k/month |
 | Pixabay | [pixabay.com/api/docs](https://pixabay.com/api/docs/) | 100 req/minute |
@@ -74,7 +77,7 @@ PEXELS_API_KEY=your_key_here
 PIXABAY_API_KEY=your_key_here
 ```
 
-You can start with just **one** key — sources without a key are automatically disabled.
+You can start with **zero** keys (Openverse works without one) — sources without a key are automatically disabled.
 
 ### 4. Run
 
@@ -91,7 +94,7 @@ Open [http://localhost:3000](http://localhost:3000) and search away.
 | Param | Type | Default | Description |
 |-------|------|---------|-------------|
 | `q` | string | — (required) | Search query |
-| `sources` | csv | all | e.g. `unsplash,pexels` |
+| `sources` | csv | all | e.g. `openverse,unsplash,pexels` |
 | `page` | int | `1` | Page number (per source) |
 | `perPage` | int | `12` | Results per source (max 30) |
 | `orientation` | enum | — | `landscape` \| `portrait` \| `square` |
@@ -120,7 +123,7 @@ curl "http://localhost:3000/api/search?q=mountain%20sunset&sources=unsplash,pixa
 
 ## 🗺️ Roadmap
 
-- [ ] More sources: Freepik, Flickr, Openverse, Wikimedia Commons
+- [ ] More sources: Freepik, Flickr, Wikimedia Commons
 - [ ] Paid stock sources with affiliate links (Shutterstock, Adobe Stock)
 - [ ] AI query expansion ("cozy morning" → coffee, sunrise, warm light…)
 - [ ] Reverse image search (CLIP embeddings)
