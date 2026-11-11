@@ -3,6 +3,11 @@ import { cookies } from "next/headers";
 import { put, del } from "@vercel/blob";
 import sharp from "sharp";
 import { randomUUID } from "crypto";
+import path from "path";
+import { readFileSync } from "fs";
+import * as _opentype from "opentype.js";
+
+const opentype = _opentype.default || _opentype;
 import { verifyToken, SESSION_COOKIE } from "../../../lib/auth";
 import { getPage, savePage, pageIdFor } from "../../../lib/pages";
 import { addNotification } from "../../../lib/notifications";
@@ -55,21 +60,60 @@ async function sightengineAiScore(buffer) {
   }
 }
 
-const xmlEscape = (s) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// Text is converted to vector paths with a bundled font, because Vercel's
+// serverless runtime has no system fonts and SVG <text> renders as boxes.
+let fontCache;
+function getFont() {
+  if (!fontCache) {
+    const buf = readFileSync(path.join(process.cwd(), "fonts", "DejaVuSans-Bold.ttf"));
+    fontCache = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+  }
+  return fontCache;
+}
+
+// Glyph-by-glyph layout bypasses opentype.js's text shaper, which chokes on
+// DejaVu's GSUB tables.
+function textToPathData(font, text, x, y, size) {
+  const scale = size / font.unitsPerEm;
+  let cx = x;
+  let d = "";
+  for (const ch of text) {
+    const glyph = font.charToGlyph(ch);
+    d += glyph.getPath(cx, y, size).toPathData(2);
+    cx += (glyph.advanceWidth || font.unitsPerEm / 2) * scale;
+  }
+  return { d, width: cx - x };
+}
 
 function watermarkSvg(width, height, text) {
-  const safe = xmlEscape(text);
-  const corner = Math.max(14, Math.round(width / 42));
-  const center = Math.max(26, Math.round(width / 14));
+  const font = getFont();
+  const cornerSize = Math.max(14, Math.round(width / 42));
+  const centerSize = Math.max(26, Math.round(width / 14));
+
+  const cornerMeasure = textToPathData(font, text, 0, 0, cornerSize);
+  const cornerPath = textToPathData(
+    font,
+    text,
+    width - 12 - cornerMeasure.width,
+    height - 12,
+    cornerSize
+  ).d;
+
+  const centerMeasure = textToPathData(font, text, 0, 0, centerSize);
+  const centerPath = textToPathData(
+    font,
+    text,
+    -centerMeasure.width / 2,
+    centerSize * 0.35,
+    centerSize
+  ).d;
+
   return Buffer.from(
     `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${center}" font-weight="bold"
-        fill="rgba(255,255,255,0.16)" text-anchor="middle"
-        transform="rotate(-28 ${width / 2} ${height / 2})">${safe}</text>
-      <text x="${width - 12}" y="${height - 12}" font-family="Arial, sans-serif" font-size="${corner}"
-        font-weight="bold" fill="rgba(255,255,255,0.85)" stroke="rgba(0,0,0,0.4)" stroke-width="1"
-        text-anchor="end">${safe}</text>
+      <g transform="translate(${width / 2} ${height / 2}) rotate(-28)">
+        <path d="${centerPath}" fill="rgba(255,255,255,0.16)"/>
+      </g>
+      <path d="${cornerPath}" fill="rgba(255,255,255,0.85)" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
     </svg>`
   );
 }

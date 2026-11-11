@@ -1705,3 +1705,136 @@ footer a:hover {
 @media (max-width: 720px) {
   .lb-nav { display: none; }
 }
+
+/* ===== Mobile layout ===== */
+@media (max-width: 720px) {
+  .topnav {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 12px 0;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    padding: 6px 9px;
+  }
+
+  .nav-user {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .avatar {
+    height: 24px;
+    width: 24px;
+    font-size: 11px;
+  }
+
+  .nav-logout {
+    font-size: 12px;
+    padding: 6px 11px;
+  }
+
+  .notif-panel {
+    position: fixed;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .hero {
+    padding: 34px 14px 18px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    margin-bottom: 14px;
+    padding: 6px 13px;
+  }
+
+  .search-bar {
+    gap: 6px;
+    margin-top: 20px;
+    padding: 6px;
+  }
+
+  .search-bar input {
+    font-size: 15px;
+    padding: 11px 10px;
+  }
+
+  .search-bar button[type="submit"] {
+    font-size: 14px;
+    padding: 0 16px;
+  }
+
+  .search-bar .mic {
+    padding: 0 11px;
+  }
+
+  .filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 14px auto 0;
+    max-width: 440px;
+  }
+
+  .filters select {
+    width: 100%;
+    text-align: center;
+  }
+
+  .page-head {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+    padding: 22px 16px;
+  }
+
+  .page-info h2 {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions .plan-cta {
+    width: 100%;
+  }
+
+  .upload-note {
+    max-width: none;
+  }
+
+  .profile-card {
+    padding: 22px 16px;
+  }
+
+  .dp-wrap {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .board-head {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .plan-price {
+    font-size: 32px;
+  }
+}

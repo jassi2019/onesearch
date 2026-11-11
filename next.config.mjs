@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      "/api/uploads": ["./fonts/**/*"],
+      "/api/uploads/route": ["./fonts/**/*"]
+    }
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
