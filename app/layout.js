@@ -12,7 +12,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${outfit.variable}`}>{children}</body>
+      <body className={`${inter.variable} ${outfit.variable}`}>
+        <div className="bg-fx" aria-hidden="true">
+          <div className="aurora" />
+          <div className="orb orb-1" />
+          <div className="orb orb-2" />
+          <div className="orb orb-3" />
+          <div className="bg-grid" />
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
