@@ -6,6 +6,26 @@ import ImageGrid from "./ImageGrid";
 const SOURCES = ["openverse", "unsplash", "pexels", "pixabay", "pinterest"];
 const TRENDING = ["nature", "business", "food", "travel", "technology", "fashion", "abstract"];
 const SKELETON_HEIGHTS = [240, 320, 190, 280, 350, 210, 260, 300, 220, 340, 200, 270];
+
+function MicIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 10v1a7 7 0 0 0 14 0v-1" />
+      <path d="M12 18v4" />
+    </svg>
+  );
+}
 const ORIENTATIONS = ["any", "landscape", "portrait", "square"];
 const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "white", "gray"];
 
@@ -126,7 +146,7 @@ export default function SearchApp() {
             title={listening ? "Listening… tap to stop" : "Search by voice"}
             aria-label="Search by voice"
           >
-            {listening ? "●" : "🎤"}
+            {listening ? <span className="rec-dot" /> : <MicIcon />}
           </button>
         )}
         <button type="submit" disabled={loading}>

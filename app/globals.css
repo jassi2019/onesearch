@@ -1,12 +1,12 @@
 :root {
-  --bg: #f6f7fc;
-  --panel: rgba(255, 255, 255, 0.72);
-  --panel-solid: #ffffff;
-  --border: rgba(30, 36, 70, 0.1);
-  --text: #1a1e2e;
-  --muted: #5f6678;
-  --accent: #6d5cf5;
-  --accent-strong: #5b49e8;
+  --bg: #0b0c12;
+  --panel: rgba(255, 255, 255, 0.055);
+  --panel-solid: #14161f;
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #f4f5f8;
+  --muted: #9aa2b1;
+  --accent: #8b7bff;
+  --accent-strong: #6d5cf5;
   --pink: #ff5e8e;
   --grad: linear-gradient(135deg, #7c5cff 0%, #b05cff 50%, #ff5e8e 100%);
   --radius: 14px;
@@ -21,7 +21,7 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
   scroll-behavior: smooth;
 }
 
@@ -42,14 +42,24 @@ body {
   pointer-events: none;
 }
 
+/* Matte film-grain texture — the "glass mat" finish */
+.bg-fx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
 /* Animation 1 — color-shifting aurora */
 .aurora {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(45% 40% at 20% 10%, rgba(124, 92, 255, 0.18), transparent 70%),
-    radial-gradient(50% 45% at 85% 5%, rgba(255, 94, 142, 0.14), transparent 70%),
-    radial-gradient(55% 50% at 50% 105%, rgba(64, 145, 255, 0.12), transparent 70%);
+    radial-gradient(45% 40% at 20% 10%, rgba(124, 92, 255, 0.26), transparent 70%),
+    radial-gradient(50% 45% at 85% 5%, rgba(255, 94, 142, 0.17), transparent 70%),
+    radial-gradient(55% 50% at 50% 105%, rgba(64, 145, 255, 0.15), transparent 70%);
   animation: aurora-shift 16s ease-in-out infinite alternate;
 }
 
@@ -131,8 +141,8 @@ body {
   bottom: -14%;
   height: 55%;
   background-image:
-    linear-gradient(rgba(109, 92, 245, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(109, 92, 245, 0.2) 1px, transparent 1px);
+    linear-gradient(rgba(139, 123, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 123, 255, 0.22) 1px, transparent 1px);
   background-size: 54px 54px;
   transform: perspective(620px) rotateX(62deg);
   transform-origin: center top;
@@ -222,7 +232,21 @@ a {
 /* ===== Hero ===== */
 .hero {
   text-align: center;
-  padding: 72px 16px 28px;
+  padding: 64px 16px 28px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  margin-bottom: 22px;
+  padding: 8px 18px;
+  animation: rise 0.6s ease both;
 }
 
 .hero h1 {
@@ -253,14 +277,14 @@ a {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 18px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 12px 36px rgba(26, 30, 70, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-bar:focus-within {
-  border-color: rgba(109, 92, 245, 0.5);
-  box-shadow: 0 12px 40px rgba(109, 92, 245, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-color: rgba(139, 123, 255, 0.55);
+  box-shadow: 0 12px 44px rgba(109, 92, 245, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .search-bar input {
@@ -276,7 +300,7 @@ a {
 }
 
 .search-bar input::placeholder {
-  color: #9299ab;
+  color: #6c7484;
 }
 
 .search-bar button[type="submit"] {
@@ -301,11 +325,30 @@ a {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
-  font-size: 17px;
-  padding: 0 15px;
-  transition: border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.search-bar .mic:hover {
+  color: var(--text);
+}
+
+.search-bar .mic svg {
+  display: block;
+}
+
+.rec-dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5a6e;
+  box-shadow: 0 0 10px rgba(255, 90, 110, 0.8);
 }
 
 .search-bar .mic:hover {
@@ -435,8 +478,8 @@ a {
 }
 
 .card:hover {
-  border-color: rgba(109, 92, 245, 0.4);
-  box-shadow: 0 18px 44px rgba(26, 30, 70, 0.16);
+  border-color: rgba(139, 123, 255, 0.45);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
   transform: translateY(-4px);
 }
 
@@ -611,7 +654,7 @@ button.dl {
   background: var(--panel-solid);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 14px 36px rgba(26, 30, 70, 0.18);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
   display: grid;
   min-width: 200px;
   overflow: hidden;
@@ -709,7 +752,7 @@ button.dl {
 }
 
 .spinner.dark {
-  border-color: rgba(26, 30, 70, 0.15);
+  border-color: rgba(255, 255, 255, 0.18);
   border-top-color: var(--accent);
 }
 
@@ -720,9 +763,9 @@ button.dl {
 .skel-card {
   background: linear-gradient(
     100deg,
-    rgba(26, 30, 70, 0.05) 40%,
-    rgba(109, 92, 245, 0.13) 50%,
-    rgba(26, 30, 70, 0.05) 60%
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(139, 123, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.05) 60%
   );
   background-size: 200% 100%;
   border: 1px solid var(--border);
@@ -807,7 +850,7 @@ footer a:hover {
 
 .plan:hover {
   transform: translateY(-5px);
-  box-shadow: 0 18px 50px rgba(26, 30, 70, 0.14);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
 }
 
 .plan.highlight {
@@ -893,7 +936,7 @@ footer a:hover {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(20, 24, 50, 0.45);
+  background: rgba(2, 3, 8, 0.7);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;

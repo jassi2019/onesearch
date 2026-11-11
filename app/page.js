@@ -6,6 +6,7 @@ export default function Home() {
     <main>
       <TopNav />
       <div className="hero">
+        <div className="hero-badge">✦ AI-powered image discovery</div>
         <h1>
           One<span>Search</span>
         </h1>
