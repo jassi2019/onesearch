@@ -99,7 +99,7 @@ export default function TopNav() {
             ) : (
               <span className="avatar">{user.name?.[0]?.toUpperCase() || "U"}</span>
             )}
-            {user.name?.split(" ")[0]}
+            <span className="uname">{user.name?.split(" ")[0]}</span>
           </a>
         )}
         {user && (

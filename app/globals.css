@@ -1808,44 +1808,61 @@ footer a:hover {
 /* ===== Mobile layout ===== */
 @media (max-width: 720px) {
   .topnav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    width: calc(100% - 20px);
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 4px;
+    width: calc(100% - 16px);
     margin-top: 10px;
-    padding: 8px 12px;
-    border-radius: 22px;
+    padding: 6px 8px 6px 12px;
+    border-radius: 999px;
   }
 
   .brand {
-    font-size: 17px;
+    font-size: 15px;
+    flex-shrink: 0;
   }
 
   .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2px;
+    flex-wrap: nowrap;
+    gap: 0;
+    min-width: 0;
   }
 
   .nav-links a {
-    font-size: 12px;
-    padding: 6px 9px;
+    font-size: 11px;
+    padding: 6px 5px;
+    white-space: nowrap;
   }
 
   .nav-user {
-    font-size: 12px;
-    gap: 6px;
+    padding: 4px;
+    gap: 0;
+  }
+
+  .nav-user .uname {
+    display: none;
   }
 
   .avatar {
-    height: 24px;
-    width: 24px;
+    height: 26px;
+    width: 26px;
     font-size: 11px;
   }
 
+  .bell {
+    height: 30px;
+    width: 30px;
+  }
+
+  .bell svg {
+    width: 15px;
+    height: 15px;
+  }
+
   .nav-logout {
-    font-size: 12px;
-    padding: 6px 11px;
+    font-size: 11px;
+    padding: 6px 9px;
+    white-space: nowrap;
   }
 
   .notif-panel {
