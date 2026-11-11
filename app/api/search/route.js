@@ -2,12 +2,30 @@ import { NextResponse } from "next/server";
 import { aggregateSearch, ALL_SOURCES } from "../../../lib/aggregate";
 import { signUrl } from "../../../lib/sign";
 
+const BLOCKED_TERMS = [
+  "nude", "nudes", "naked", "porn", "porno", "pornography", "xxx", "nsfw",
+  "sex", "sexy", "erotic", "erotica", "hentai", "boobs", "tits", "pussy",
+  "dick", "penis", "vagina", "stripper", "topless", "lingerie"
+];
+
+function isBlockedQuery(q) {
+  const words = q.toLowerCase().split(/[^a-z]+/);
+  return BLOCKED_TERMS.some((t) => words.includes(t));
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get("q") || "").trim();
 
   if (!query) {
     return NextResponse.json({ error: "Missing query parameter 'q'" }, { status: 400 });
+  }
+
+  if (isBlockedQuery(query)) {
+    return NextResponse.json(
+      { error: "This search isn't allowed. OneSearch only serves safe-for-work content.", blocked: true },
+      { status: 422 }
+    );
   }
 
   const sources = (searchParams.get("sources") || "")

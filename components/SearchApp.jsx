@@ -44,6 +44,7 @@ export default function SearchApp() {
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [blockedMsg, setBlockedMsg] = useState("");
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -70,7 +71,15 @@ export default function SearchApp() {
 
         const res = await fetch(`/api/search?${params}`);
         const data = await res.json();
+        if (res.status === 422 && data.blocked) {
+          setImages([]);
+          setSuggestions([]);
+          setSearched(true);
+          setBlockedMsg(data.error);
+          return;
+        }
         if (!res.ok) throw new Error(data.error || "Search failed");
+        setBlockedMsg("");
 
         setImages((prev) => {
           if (nextPage === 1) return data.results;
@@ -242,7 +251,7 @@ export default function SearchApp() {
       )}
 
       {searched && !loading && images.length === 0 && (
-        <p className="empty">No results. Try another search.</p>
+        <p className="empty">{blockedMsg || "No results. Try another search."}</p>
       )}
 
       {loadingNew && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { addToBoard, getBoardNames } from "../lib/boards";
+import { addToBoard, getBoardNames, toggleFavorite, isFavorite } from "../lib/boards";
 
 const QUALITY_OPTS = [
   { key: "low", label: "Low — fast" },
@@ -20,6 +20,7 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
   const [menu, setMenu] = useState(null);
   const [newBoard, setNewBoard] = useState("");
   const [saved, setSaved] = useState(false);
+  const [favTick, setFavTick] = useState(0);
 
   useEffect(() => {
     setMenu(null);
@@ -88,6 +89,15 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
 
         <div className="lb-bar">
           <div className="lb-actions">
+            <button
+              className={`lb-btn fav ${isFavorite(img.id) ? "active" : ""}`}
+              onClick={() => {
+                toggleFavorite(img);
+                setFavTick((t) => t + 1);
+              }}
+            >
+              {isFavorite(img.id) ? "♥ Favourited" : "♡ Favourite"}
+            </button>
             <div className="lb-menu-wrap">
               <button
                 className="lb-btn"

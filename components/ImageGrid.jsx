@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addToBoard, getBoardNames } from "../lib/boards";
+import { addToBoard, getBoardNames, toggleFavorite, isFavorite } from "../lib/boards";
 import Lightbox from "./Lightbox";
 
 const QUALITY_OPTS = [
@@ -21,6 +21,7 @@ export default function ImageGrid({ images, quality = "high" }) {
   const [flash, setFlash] = useState(null);
   const [newBoard, setNewBoard] = useState("");
   const [lightbox, setLightbox] = useState(null);
+  const [favTick, setFavTick] = useState(0);
 
   if (!images.length) return null;
 
@@ -47,6 +48,17 @@ export default function ImageGrid({ images, quality = "high" }) {
           </button>
           <div className="card-overlay" />
           <div className="card-actions">
+            <button
+              className={`act fav ${isFavorite(img.id) ? "active" : ""}`}
+              onClick={() => {
+                toggleFavorite(img);
+                setFavTick((t) => t + 1);
+              }}
+              title="Favourite"
+              aria-label="Favourite"
+            >
+              {isFavorite(img.id) ? "♥" : "♡"}
+            </button>
             <button
               className="act"
               onClick={() => toggleMenu(img.id, "save")}

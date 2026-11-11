@@ -8,9 +8,9 @@ export default function TopNav() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => (r.ok ? r.json() : { user: null }))
-      .then((d) => setUser(d.user))
+    fetch("/api/profile")
+      .then((r) => (r.ok ? r.json() : { profile: null }))
+      .then((d) => setUser(d.profile))
       .catch(() => {});
   }, []);
 
@@ -29,10 +29,15 @@ export default function TopNav() {
         <a href="/collections">Collections</a>
         <a href="/pricing">Pricing</a>
         {user && (
-          <span className="nav-user">
-            <span className="avatar">{user.name?.[0]?.toUpperCase() || "U"}</span>
+          <a className="nav-user" href="/profile" title="My profile">
+            {user.dp ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="avatar avatar-img" src={user.dp} alt="" />
+            ) : (
+              <span className="avatar">{user.name?.[0]?.toUpperCase() || "U"}</span>
+            )}
             {user.name?.split(" ")[0]}
-          </span>
+          </a>
         )}
         {user && (
           <button className="nav-logout" onClick={logout}>
