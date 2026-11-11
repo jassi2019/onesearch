@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import { addToBoard, getBoardNames } from "../lib/boards";
 
+const QUALITY_OPTS = [
+  { key: "low", label: "Low — fast" },
+  { key: "high", label: "High resolution" },
+  { key: "ultra", label: "Ultra HD — original" }
+];
+
 const DL_PRESETS = [
-  { key: "", label: "Original" },
   { key: "ig", label: "Instagram 1080×1080" },
   { key: "story", label: "Story 1080×1920" },
   { key: "yt", label: "YouTube 1280×720" }
@@ -131,14 +136,24 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
                 </button>
                 {menu === "dl" && (
                   <div className="card-menu">
+                    <span className="menu-label">Quality</span>
+                    {QUALITY_OPTS.map(
+                      (q) =>
+                        (img.dls?.[q.key] || img.dl) && (
+                          <a
+                            key={q.key}
+                            href={img.dls?.[q.key] || img.dl}
+                            onClick={() => setMenu(null)}
+                          >
+                            {q.label}
+                          </a>
+                        )
+                    )}
+                    <span className="menu-label">Social sizes</span>
                     {DL_PRESETS.map((p) => {
-                      const base = img.dls?.[quality] || img.dl;
+                      const base = img.dls?.ultra || img.dls?.high || img.dl;
                       return (
-                        <a
-                          key={p.key}
-                          href={p.key ? `${base}&size=${p.key}` : base}
-                          onClick={() => setMenu(null)}
-                        >
+                        <a key={p.key} href={`${base}&size=${p.key}`} onClick={() => setMenu(null)}>
                           {p.label}
                         </a>
                       );

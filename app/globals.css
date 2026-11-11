@@ -682,6 +682,15 @@ button.dl {
   background: rgba(124, 92, 255, 0.12);
 }
 
+.menu-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 9px 14px 4px;
+  text-transform: uppercase;
+}
+
 .new-board {
   display: flex;
   gap: 6px;
