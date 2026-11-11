@@ -245,6 +245,17 @@ export default function SearchApp() {
         <p className="empty">No results. Try another search.</p>
       )}
 
+      {loadingNew && (
+        <div className="search-loader">
+          <div className="dots">
+            <span />
+            <span />
+            <span />
+          </div>
+          <p>Finding the best images…</p>
+        </div>
+      )}
+
       {loadingNew ? (
         <div className="grid">
           {SKELETON_HEIGHTS.map((h, i) => (

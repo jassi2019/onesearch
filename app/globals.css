@@ -329,6 +329,43 @@ a {
   font-size: 13px;
 }
 
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  color: #1a1e2e;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.google-btn:hover {
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 .auth-switch {
   color: var(--muted);
   font-size: 13px;
@@ -862,22 +899,64 @@ button.dl {
 /* ===== Loading ===== */
 .spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #fff;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  background: conic-gradient(from 0deg, transparent 8%, #fff 85%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  animation: spin 0.8s linear infinite;
   vertical-align: middle;
 }
 
 .spinner.dark {
-  border-color: rgba(255, 255, 255, 0.18);
-  border-top-color: var(--accent);
+  background: conic-gradient(from 0deg, transparent 8%, #8b7bff 60%, #ff5e8e 90%);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.search-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0 26px;
+}
+
+.search-loader .dots {
+  display: flex;
+  gap: 9px;
+}
+
+.search-loader .dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--grad);
+  box-shadow: 0 0 14px rgba(139, 123, 255, 0.6);
+  animation: dot-bounce 0.9s ease-in-out infinite;
+}
+
+.search-loader .dots span:nth-child(2) { animation-delay: 0.12s; }
+.search-loader .dots span:nth-child(3) { animation-delay: 0.24s; }
+
+@keyframes dot-bounce {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  40% { transform: translateY(-12px) scale(1.15); opacity: 1; }
+}
+
+.search-loader p {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  animation: fade-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes fade-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .skel-card {
