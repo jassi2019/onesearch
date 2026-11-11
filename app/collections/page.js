@@ -1,4 +1,5 @@
 import CollectionsView from "../../components/CollectionsView";
+import TopNav from "../../components/TopNav";
 
 export const metadata = {
   title: "Collections — OneSearch",
@@ -8,10 +9,7 @@ export const metadata = {
 export default function CollectionsPage() {
   return (
     <main>
-      <nav className="topnav">
-        <a href="/">Search</a>
-        <a href="/pricing">Pricing</a>
-      </nav>
+      <TopNav />
       <div className="hero">
         <h1>
           My <span>Collections</span>

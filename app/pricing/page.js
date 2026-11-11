@@ -1,4 +1,5 @@
 import PricingPlans from "../../components/PricingPlans";
+import TopNav from "../../components/TopNav";
 
 export const metadata = {
   title: "Pricing — OneSearch",
@@ -8,6 +9,7 @@ export const metadata = {
 export default function PricingPage() {
   return (
     <main>
+      <TopNav />
       <div className="hero">
         <h1>
           Simple <span>pricing</span>

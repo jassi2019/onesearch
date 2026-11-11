@@ -1,12 +1,10 @@
 import SearchApp from "../components/SearchApp";
+import TopNav from "../components/TopNav";
 
 export default function Home() {
   return (
     <main>
-      <nav className="topnav">
-        <a href="/collections">Collections</a>
-        <a href="/pricing">Pricing</a>
-      </nav>
+      <TopNav />
       <div className="hero">
         <h1>
           One<span>Search</span>

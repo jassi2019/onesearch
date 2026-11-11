@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import ImageGrid from "./ImageGrid";
 
 const SOURCES = ["openverse", "unsplash", "pexels", "pixabay", "pinterest"];
+const TRENDING = ["nature", "business", "food", "travel", "technology", "fashion", "abstract"];
 const ORIENTATIONS = ["any", "landscape", "portrait", "square"];
 const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "white", "gray"];
 
@@ -142,6 +143,24 @@ export default function SearchApp() {
           ))}
         </select>
       </div>
+
+      {!searched && (
+        <div className="suggestions">
+          <span>Trending:</span>
+          {TRENDING.map((t) => (
+            <span
+              key={t}
+              className="chip"
+              onClick={() => {
+                setQuery(t);
+                runSearch(1, t);
+              }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
 
       {suggestions.length > 0 && (
         <div className="suggestions">
