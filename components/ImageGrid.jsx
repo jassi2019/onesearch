@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addToBoard, getBoardNames } from "../lib/boards";
+import Lightbox from "./Lightbox";
 
 const DL_PRESETS = [
   { key: "", label: "Original" },
@@ -14,6 +15,7 @@ export default function ImageGrid({ images }) {
   const [menu, setMenu] = useState(null); // { id, type: "dl" | "save" }
   const [flash, setFlash] = useState(null);
   const [newBoard, setNewBoard] = useState("");
+  const [lightbox, setLightbox] = useState(null);
 
   if (!images.length) return null;
 
@@ -32,12 +34,12 @@ export default function ImageGrid({ images }) {
 
   return (
     <div className="grid">
-      {images.map((img) => (
+      {images.map((img, idx) => (
         <figure className="card" key={img.id}>
-          <a href={img.pageUrl} target="_blank" rel="noopener noreferrer">
+          <button className="img-open" onClick={() => setLightbox(idx)} aria-label="Open image">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.thumb} alt={img.alt} loading="lazy" />
-          </a>
+          </button>
           <figcaption className="meta">
             <a href={img.photographerUrl || img.pageUrl} target="_blank" rel="noopener noreferrer">
               {img.photographer}
@@ -61,7 +63,6 @@ export default function ImageGrid({ images }) {
                   ⬇
                 </button>
               )}
-              <span className={`badge ${img.source}`}>{img.source}</span>
             </span>
           </figcaption>
 
@@ -104,6 +105,17 @@ export default function ImageGrid({ images }) {
           )}
         </figure>
       ))}
+
+      {lightbox !== null && (
+        <Lightbox
+          images={images}
+          index={lightbox}
+          onClose={() => setLightbox(null)}
+          onNavigate={(dir) =>
+            setLightbox((i) => Math.min(images.length - 1, Math.max(0, i + dir)))
+          }
+        />
+      )}
     </div>
   );
 }

@@ -101,8 +101,6 @@ export default function SearchApp() {
     rec.start();
   }, [runSearch]);
 
-  const disabledSources = sourceStats.filter((s) => !s.enabled).map((s) => s.name);
-
   return (
     <>
       <form
@@ -180,18 +178,12 @@ export default function SearchApp() {
 
       {searched && (
         <p className="status">
-          {sourceStats
-            .filter((s) => s.enabled)
-            .map((s) => `${s.name}: ${s.total ?? s.count}`)
-            .join(" · ") || "No sources returned results"}
-          {disabledSources.length > 0 && (
-            <>
-              {" "}
-              <span className="warn">
-                (no API key for: {disabledSources.join(", ")} — see .env.example)
-              </span>
-            </>
-          )}
+          {(() => {
+            const total = sourceStats
+              .filter((s) => s.enabled)
+              .reduce((sum, s) => sum + (s.total ?? s.count ?? 0), 0);
+            return total > 0 ? `${total.toLocaleString()} results found` : "";
+          })()}
         </p>
       )}
 

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { getBoards, removeFromBoard, deleteBoard } from "../lib/boards";
+import Lightbox from "./Lightbox";
 
 export default function CollectionsView() {
   const [boards, setBoards] = useState(null);
+  const [lightbox, setLightbox] = useState(null); // { board, index }
 
   const refresh = () => setBoards(getBoards());
   useEffect(refresh, []);
@@ -39,12 +41,16 @@ export default function CollectionsView() {
             </button>
           </div>
           <div className="grid">
-            {boards[name].map((img) => (
+            {boards[name].map((img, idx) => (
               <figure className="card" key={img.id}>
-                <a href={img.pageUrl} target="_blank" rel="noopener noreferrer">
+                <button
+                  className="img-open"
+                  onClick={() => setLightbox({ board: name, index: idx })}
+                  aria-label="Open image"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.thumb} alt={img.alt} loading="lazy" />
-                </a>
+                </button>
                 <figcaption className="meta">
                   <a
                     href={img.photographerUrl || img.pageUrl}
@@ -76,6 +82,20 @@ export default function CollectionsView() {
           </div>
         </section>
       ))}
+
+      {lightbox && boards[lightbox.board] && (
+        <Lightbox
+          images={boards[lightbox.board]}
+          index={lightbox.index}
+          onClose={() => setLightbox(null)}
+          onNavigate={(dir) =>
+            setLightbox((lb) => ({
+              ...lb,
+              index: Math.min(boards[lb.board].length - 1, Math.max(0, lb.index + dir))
+            }))
+          }
+        />
+      )}
     </div>
   );
 }
