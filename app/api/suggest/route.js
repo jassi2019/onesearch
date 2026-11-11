@@ -27,6 +27,21 @@ async function suggestWithClaude(query) {
   return arr.filter((s) => typeof s === "string").slice(0, 4);
 }
 
+// Free, keyless LLM API
+async function suggestWithPollinations(query) {
+  const prompt = `Give 4 short, diverse image-search queries closely related to: "${query}". Reply with ONLY a JSON array of strings, same language as the input.`;
+  const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
+    signal: AbortSignal.timeout(8000)
+  });
+  if (!res.ok) throw new Error(`Pollinations ${res.status}`);
+  const text = await res.text();
+  const match = text.match(/\[[\s\S]*?\]/);
+  const arr = JSON.parse(match ? match[0] : "[]");
+  const clean = arr.filter((s) => typeof s === "string" && s.length < 60).slice(0, 4);
+  if (!clean.length) throw new Error("empty");
+  return clean;
+}
+
 async function suggestWithDatamuse(query) {
   const res = await fetch(
     `https://api.datamuse.com/words?ml=${encodeURIComponent(query)}&max=8`,
@@ -45,11 +60,18 @@ export async function GET(request) {
   const query = (searchParams.get("q") || "").trim();
   if (!query) return NextResponse.json({ suggestions: [] });
 
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      return NextResponse.json({ suggestions: await suggestWithClaude(query), ai: true });
+    } catch {}
+  }
+
   try {
-    const suggestions = process.env.ANTHROPIC_API_KEY
-      ? await suggestWithClaude(query)
-      : await suggestWithDatamuse(query);
-    return NextResponse.json({ suggestions, ai: Boolean(process.env.ANTHROPIC_API_KEY) });
+    return NextResponse.json({ suggestions: await suggestWithPollinations(query), ai: true });
+  } catch {}
+
+  try {
+    return NextResponse.json({ suggestions: await suggestWithDatamuse(query), ai: false });
   } catch {
     return NextResponse.json({ suggestions: [] });
   }
