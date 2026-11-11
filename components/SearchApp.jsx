@@ -35,6 +35,9 @@ export default function SearchApp() {
   const [orientation, setOrientation] = useState("any");
   const [color, setColor] = useState("any");
   const [quality, setQuality] = useState("high");
+  const [sort, setSort] = useState("relevance");
+  const [imgType, setImgType] = useState("all");
+  const [license, setLicense] = useState("all");
   const [images, setImages] = useState([]);
   const [sourceStats, setSourceStats] = useState([]);
   const [page, setPage] = useState(1);
@@ -58,6 +61,9 @@ export default function SearchApp() {
       if (!q || !activeSources.length) return;
       const ori = overrides.orientation ?? orientation;
       const col = overrides.color ?? color;
+      const srt = overrides.sort ?? sort;
+      const typ = overrides.imgType ?? imgType;
+      const lic = overrides.license ?? license;
       setLoading(true);
       if (nextPage === 1) setLoadingNew(true);
       try {
@@ -68,6 +74,9 @@ export default function SearchApp() {
         });
         if (ori !== "any") params.set("orientation", ori);
         if (col !== "any") params.set("color", col);
+        if (srt === "latest") params.set("sort", "latest");
+        if (typ !== "all") params.set("type", typ);
+        if (lic !== "all") params.set("license", lic);
 
         const res = await fetch(`/api/search?${params}`);
         const data = await res.json();
@@ -103,7 +112,7 @@ export default function SearchApp() {
         setLoadingNew(false);
       }
     },
-    [query, orientation, color]
+    [query, orientation, color, sort, imgType, license]
   );
 
   const startVoiceSearch = useCallback(() => {
@@ -200,6 +209,41 @@ export default function SearchApp() {
           <option value="low">Low quality</option>
           <option value="high">High quality</option>
           <option value="ultra">Ultra quality</option>
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => {
+            const v = e.target.value;
+            setSort(v);
+            if (searched) runSearch(1, undefined, { sort: v });
+          }}
+        >
+          <option value="relevance">Most relevant</option>
+          <option value="latest">Newest first</option>
+        </select>
+        <select
+          value={imgType}
+          onChange={(e) => {
+            const v = e.target.value;
+            setImgType(v);
+            if (searched) runSearch(1, undefined, { imgType: v });
+          }}
+        >
+          <option value="all">All types</option>
+          <option value="photo">Photos</option>
+          <option value="illustration">Illustrations</option>
+          <option value="vector">Vectors</option>
+        </select>
+        <select
+          value={license}
+          onChange={(e) => {
+            const v = e.target.value;
+            setLicense(v);
+            if (searched) runSearch(1, undefined, { license: v });
+          }}
+        >
+          <option value="all">All free images</option>
+          <option value="commercial">Commercial use ✓</option>
         </select>
       </div>
 

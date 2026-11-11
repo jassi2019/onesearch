@@ -37,9 +37,15 @@ export async function GET(request) {
   const perPage = Math.min(30, Math.max(1, parseInt(searchParams.get("perPage") || "12", 10) || 12));
   const orientation = searchParams.get("orientation") || undefined;
   const color = searchParams.get("color") || undefined;
+  const sort = searchParams.get("sort") === "latest" ? "latest" : undefined;
+  const typeParam = searchParams.get("type");
+  const type = ["photo", "illustration", "vector"].includes(typeParam) ? typeParam : undefined;
+  const license = searchParams.get("license") === "commercial" ? "commercial" : undefined;
 
   try {
-    const data = await aggregateSearch({ query, sources, page, perPage, orientation, color });
+    const data = await aggregateSearch({
+      query, sources, page, perPage, orientation, color, sort, type, license
+    });
     const sign = (u) => (u ? `/api/download?u=${encodeURIComponent(u)}&s=${signUrl(u)}` : null);
     data.results = data.results.map((r) => ({
       ...r,
