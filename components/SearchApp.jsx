@@ -72,7 +72,11 @@ export default function SearchApp() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Search failed");
 
-        setImages((prev) => (nextPage === 1 ? data.results : [...prev, ...data.results]));
+        setImages((prev) => {
+          if (nextPage === 1) return data.results;
+          const seen = new Set(prev.map((i) => i.id));
+          return [...prev, ...data.results.filter((r) => !seen.has(r.id))];
+        });
         setSourceStats(data.sources || []);
         setPage(nextPage);
         setSearched(true);
