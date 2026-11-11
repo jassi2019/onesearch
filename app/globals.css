@@ -21,6 +21,7 @@
 }
 
 html {
+  color-scheme: dark;
   scroll-behavior: smooth;
 }
 
@@ -346,6 +347,11 @@ a {
 
 .filters select:hover {
   border-color: var(--accent);
+  color: var(--text);
+}
+
+.filters select option {
+  background: var(--panel-solid);
   color: var(--text);
 }
 
