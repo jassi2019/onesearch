@@ -1,5 +1,6 @@
 import SearchApp from "../components/SearchApp";
 import TopNav from "../components/TopNav";
+import AnimatedTitle from "../components/AnimatedTitle";
 
 export default function Home() {
   return (
@@ -7,9 +8,7 @@ export default function Home() {
       <TopNav />
       <div className="hero">
         <div className="hero-badge">✦ AI-powered image discovery</div>
-        <h1>
-          One<span>Search</span>
-        </h1>
+        <AnimatedTitle />
         <p>Millions of free, high-quality images — one search.</p>
       </div>
       <div className="container">

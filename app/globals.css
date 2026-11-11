@@ -814,6 +814,74 @@ img {
   color: transparent;
 }
 
+/* ===== Animated 3D title ===== */
+.hero-title {
+  display: flex;
+  justify-content: center;
+  font-size: clamp(38px, 7vw, 66px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  perspective: 600px;
+  animation: title-glow 3.5s ease-in-out infinite;
+}
+
+@keyframes title-glow {
+  0%, 100% { filter: drop-shadow(0 12px 30px rgba(124, 92, 255, 0.25)); }
+  50% { filter: drop-shadow(0 16px 44px rgba(255, 94, 142, 0.4)); }
+}
+
+.hero-title .lt {
+  display: inline-block;
+  transform-style: preserve-3d;
+  animation:
+    letter-in 0.75s cubic-bezier(0.2, 0.7, 0.3, 1.25) both,
+    letter-float 3.4s ease-in-out infinite,
+    none;
+}
+
+.hero-title .lt.grad {
+  background: linear-gradient(120deg, #7c5cff, #b05cff, #ff5e8e, #7c5cff);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    letter-in 0.75s cubic-bezier(0.2, 0.7, 0.3, 1.25) both,
+    letter-float 3.4s ease-in-out infinite,
+    grad-flow 5s linear infinite;
+}
+
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: rotateX(95deg) translateY(36px) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(0deg) translateY(0) scale(1);
+  }
+}
+
+@keyframes letter-float {
+  0%, 100% { transform: translateY(0) rotateX(0deg); }
+  50% { transform: translateY(-7px) rotateX(10deg); }
+}
+
+@keyframes grad-flow {
+  to { background-position: 300% center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title,
+  .hero-title .lt,
+  .hero-title .lt.grad {
+    animation: none;
+  }
+}
+
 .hero p {
   color: var(--muted);
   margin-top: 14px;
