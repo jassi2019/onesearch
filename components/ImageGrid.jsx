@@ -40,31 +40,36 @@ export default function ImageGrid({ images, quality = "high" }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.srcs?.[quality] || img.thumb} alt={img.alt} loading="lazy" />
           </button>
-          <figcaption className="meta">
-            <a href={img.photographerUrl || img.pageUrl} target="_blank" rel="noopener noreferrer">
+          <div className="card-overlay">
+            <a
+              className="ph-chip"
+              href={img.photographerUrl || img.pageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {img.photographer}
             </a>
-            <span className="meta-actions">
+          </div>
+          <div className="card-actions">
+            <button
+              className="act"
+              onClick={() => toggleMenu(img.id, "save")}
+              title="Save to board"
+              aria-label="Save to board"
+            >
+              {flash === img.id ? "✓" : "+"}
+            </button>
+            {img.dl && (
               <button
-                className="dl"
-                onClick={() => toggleMenu(img.id, "save")}
-                title="Save to board"
-                aria-label="Save to board"
+                className="act"
+                onClick={() => toggleMenu(img.id, "dl")}
+                title="Download image"
+                aria-label="Download image"
               >
-                {flash === img.id ? "✓" : "+"}
+                ⬇
               </button>
-              {img.dl && (
-                <button
-                  className="dl"
-                  onClick={() => toggleMenu(img.id, "dl")}
-                  title="Download image"
-                  aria-label="Download image"
-                >
-                  ⬇
-                </button>
-              )}
-            </span>
-          </figcaption>
+            )}
+          </div>
 
           {menu && menu.id === img.id && menu.type === "dl" && (
             <div className="card-menu">
