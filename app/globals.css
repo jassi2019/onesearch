@@ -602,6 +602,14 @@ a {
   padding: 12px 26px;
 }
 
+.upload-note {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 8px;
+  max-width: 180px;
+  text-align: center;
+}
+
 .plan-cta.ghost-active {
   background: transparent;
   border: 1px solid var(--accent);

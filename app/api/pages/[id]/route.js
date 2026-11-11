@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { verifyToken, SESSION_COOKIE } from "../../../../lib/auth";
-import { getPage, pageIdFor } from "../../../../lib/pages";
+import { verifyToken, SESSION_COOKIE, getUser } from "../../../../lib/auth";
+import { getPage, pageIdFor, ensurePage } from "../../../../lib/pages";
 
 export async function GET(request, { params }) {
   const token = cookies().get(SESSION_COOKIE)?.value;
   const session = token ? verifyToken(token) : null;
   if (!session) return NextResponse.json({ error: "Not logged in" }, { status: 401 });
 
-  const page = await getPage(params.id);
-  if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
-
   const myId = pageIdFor(session.email);
+
+  let page = await getPage(params.id);
+  if (!page && myId === params.id) {
+    // Owner's page record may predate the pages feature — create it on first visit
+    const user = await getUser(session.email);
+    if (user) page = await ensurePage(user);
+  }
+  if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
   return NextResponse.json({
     page: {
       pageId: page.pageId,

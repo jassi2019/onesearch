@@ -110,6 +110,7 @@ export default function UserPage({ pageId }) {
                 {busy ? <span className="spinner" /> : "⬆ Upload image"}
               </button>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={upload} />
+              <p className="upload-note">Original photos only — AI-generated images are not allowed.</p>
             </>
           ) : (
             <button

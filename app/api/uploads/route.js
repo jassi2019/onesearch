@@ -11,6 +11,20 @@ function session() {
   return token ? verifyToken(token) : null;
 }
 
+// Best-effort AI-image detection: generators commonly embed their name or the
+// generation prompt in EXIF/XMP/PNG-text metadata.
+const AI_MARKERS = [
+  "stable diffusion", "stable-diffusion", "sdxl", "sd-webui", "automatic1111",
+  "comfyui", "invokeai", "novelai", "midjourney", "dall-e", "dall·e", "dalle",
+  "adobe firefly", "firefly image", "leonardo.ai", "ideogram", "flux.1",
+  "c2pa.ai", "trainedalgorithmicmedia", "\"prompt\":", "negative prompt:"
+];
+
+function looksAiGenerated(buffer) {
+  const sample = buffer.subarray(0, 256 * 1024).toString("latin1").toLowerCase();
+  return AI_MARKERS.some((m) => sample.includes(m));
+}
+
 export async function POST(request) {
   const s = session();
   if (!s) return NextResponse.json({ error: "Not logged in" }, { status: 401 });
@@ -27,6 +41,14 @@ export async function POST(request) {
   }
 
   const input = Buffer.from(await file.arrayBuffer());
+
+  if (looksAiGenerated(input)) {
+    return NextResponse.json(
+      { error: "AI-generated images are not allowed on creator pages" },
+      { status: 422 }
+    );
+  }
+
   let output;
   try {
     output = await sharp(input)
