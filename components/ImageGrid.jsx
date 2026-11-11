@@ -15,7 +15,14 @@ export default function ImageGrid({ images }) {
             <a href={img.photographerUrl || img.pageUrl} target="_blank" rel="noopener noreferrer">
               {img.photographer}
             </a>
-            <span className={`badge ${img.source}`}>{img.source}</span>
+            <span className="meta-actions">
+              {img.dl && (
+                <a className="dl" href={img.dl} title="Download image" aria-label="Download image">
+                  ⬇
+                </a>
+              )}
+              <span className={`badge ${img.source}`}>{img.source}</span>
+            </span>
           </figcaption>
         </figure>
       ))}

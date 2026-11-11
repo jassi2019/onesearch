@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { aggregateSearch, ALL_SOURCES } from "../../../lib/aggregate";
+import { signUrl } from "../../../lib/sign";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -21,6 +22,10 @@ export async function GET(request) {
 
   try {
     const data = await aggregateSearch({ query, sources, page, perPage, orientation, color });
+    data.results = data.results.map((r) => ({
+      ...r,
+      dl: r.full ? `/api/download?u=${encodeURIComponent(r.full)}&s=${signUrl(r.full)}` : null
+    }));
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json({ error: "Search failed", detail: err.message }, { status: 502 });

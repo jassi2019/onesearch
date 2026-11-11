@@ -205,6 +205,28 @@ a {
   color: var(--text);
 }
 
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dl {
+  background: rgba(110, 139, 255, 0.12);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 8px;
+  text-decoration: none;
+}
+
+.dl:hover {
+  border-color: var(--accent);
+  color: var(--accent) !important;
+}
+
 .badge {
   border-radius: 6px;
   font-size: 11px;
@@ -248,4 +270,142 @@ footer {
   margin-top: 48px;
   padding: 24px 16px;
   text-align: center;
+}
+
+.topnav {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 20px 0;
+}
+
+.topnav a {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.topnav a:hover {
+  color: var(--text);
+}
+
+/* Pricing */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  max-width: 980px;
+  margin: 8px auto 0;
+}
+
+.plan {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan.highlight {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.plan-tag {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-strong);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+}
+
+.plan h2 {
+  font-size: 18px;
+}
+
+.plan-price {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 10px 0 18px;
+}
+
+.plan-price span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.plan ul {
+  list-style: none;
+  display: grid;
+  gap: 9px;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.plan-cta {
+  margin-top: auto;
+  background: var(--accent-strong);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px;
+}
+
+.plan-cta:hover:not(:disabled) {
+  background: var(--accent);
+}
+
+.plan-cta.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: default;
+}
+
+.pricing-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 28px;
+  text-align: center;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  max-width: 420px;
+  width: 100%;
+  padding: 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.modal-note {
+  color: var(--muted);
+  font-size: 14px;
 }
