@@ -19,6 +19,7 @@ export default function SearchApp() {
   const [searched, setSearched] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -54,6 +55,13 @@ export default function SearchApp() {
         setSourceStats(data.sources || []);
         setPage(nextPage);
         setSearched(true);
+
+        if (nextPage === 1) {
+          fetch(`/api/suggest?q=${encodeURIComponent(q)}`)
+            .then((r) => r.json())
+            .then((d) => setSuggestions(d.suggestions || []))
+            .catch(() => setSuggestions([]));
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -151,6 +159,24 @@ export default function SearchApp() {
           ))}
         </select>
       </div>
+
+      {suggestions.length > 0 && (
+        <div className="suggestions">
+          <span>Related:</span>
+          {suggestions.map((s) => (
+            <span
+              key={s}
+              className="chip"
+              onClick={() => {
+                setQuery(s);
+                runSearch(1, s);
+              }}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      )}
 
       {searched && (
         <p className="status">

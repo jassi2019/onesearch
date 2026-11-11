@@ -1,7 +1,34 @@
 "use client";
 
+import { useState } from "react";
+import { addToBoard, getBoardNames } from "../lib/boards";
+
+const DL_PRESETS = [
+  { key: "", label: "Original" },
+  { key: "ig", label: "Instagram 1080×1080" },
+  { key: "story", label: "Story 1080×1920" },
+  { key: "yt", label: "YouTube 1280×720" }
+];
+
 export default function ImageGrid({ images }) {
+  const [menu, setMenu] = useState(null); // { id, type: "dl" | "save" }
+  const [flash, setFlash] = useState(null);
+  const [newBoard, setNewBoard] = useState("");
+
   if (!images.length) return null;
+
+  const toggleMenu = (id, type) =>
+    setMenu((m) => (m && m.id === id && m.type === type ? null : { id, type }));
+
+  const save = (img, board) => {
+    const name = board.trim();
+    if (!name) return;
+    addToBoard(name, img);
+    setMenu(null);
+    setNewBoard("");
+    setFlash(img.id);
+    setTimeout(() => setFlash(null), 1400);
+  };
 
   return (
     <div className="grid">
@@ -16,14 +43,65 @@ export default function ImageGrid({ images }) {
               {img.photographer}
             </a>
             <span className="meta-actions">
+              <button
+                className="dl"
+                onClick={() => toggleMenu(img.id, "save")}
+                title="Save to board"
+                aria-label="Save to board"
+              >
+                {flash === img.id ? "✓" : "+"}
+              </button>
               {img.dl && (
-                <a className="dl" href={img.dl} title="Download image" aria-label="Download image">
+                <button
+                  className="dl"
+                  onClick={() => toggleMenu(img.id, "dl")}
+                  title="Download image"
+                  aria-label="Download image"
+                >
                   ⬇
-                </a>
+                </button>
               )}
               <span className={`badge ${img.source}`}>{img.source}</span>
             </span>
           </figcaption>
+
+          {menu && menu.id === img.id && menu.type === "dl" && (
+            <div className="card-menu">
+              {DL_PRESETS.map((p) => (
+                <a
+                  key={p.key}
+                  href={p.key ? `${img.dl}&size=${p.key}` : img.dl}
+                  onClick={() => setMenu(null)}
+                >
+                  {p.label}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {menu && menu.id === img.id && menu.type === "save" && (
+            <div className="card-menu">
+              {getBoardNames().map((b) => (
+                <button key={b} onClick={() => save(img, b)}>
+                  {b}
+                </button>
+              ))}
+              <form
+                className="new-board"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  save(img, newBoard);
+                }}
+              >
+                <input
+                  placeholder="New board name…"
+                  value={newBoard}
+                  onChange={(e) => setNewBoard(e.target.value)}
+                />
+                <button type="submit">Add</button>
+              </form>
+            </div>
+          )}
         </figure>
       ))}
     </div>

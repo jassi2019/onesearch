@@ -4,6 +4,7 @@ export default function Home() {
   return (
     <main>
       <nav className="topnav">
+        <a href="/collections">Collections</a>
         <a href="/pricing">Pricing</a>
       </nav>
       <div className="hero">
