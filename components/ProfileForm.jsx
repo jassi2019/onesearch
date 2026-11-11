@@ -16,6 +16,7 @@ export default function ProfileForm() {
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [bio, setBio] = useState("");
+  const [accountType, setAccountType] = useState("personal");
   const [dp, setDp] = useState("");
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null); // { ok, text }
@@ -32,6 +33,7 @@ export default function ProfileForm() {
         setGender(d.profile.gender);
         setBio(d.profile.bio);
         setDp(d.profile.dp);
+        setAccountType(d.profile.accountType || "personal");
       })
       .catch(() => {});
 
@@ -72,7 +74,7 @@ export default function ProfileForm() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, gender, bio, dp })
+        body: JSON.stringify({ name, gender, bio, dp, accountType })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
@@ -132,6 +134,14 @@ export default function ProfileForm() {
         </label>
 
         <label>
+          Account type
+          <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+          </select>
+        </label>
+
+        <label>
           Gender
           <select value={gender} onChange={(e) => setGender(e.target.value)}>
             {GENDERS.map((g) => (
@@ -161,6 +171,11 @@ export default function ProfileForm() {
       </form>
 
       <div className="profile-side">
+        {profile.pageId && (
+          <a className="plan-cta mypage-btn" href={`/u/${profile.pageId}`}>
+            🖼 View my page
+          </a>
+        )}
         <div className="stat-card">
           <span className="stat-num">{stats.favs}</span>
           <span>Favourites</span>

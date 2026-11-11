@@ -7,6 +7,7 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions
 } from "../../../../lib/auth";
+import { ensurePage } from "../../../../lib/pages";
 
 export async function POST(request) {
   const { name, email, password } = await request.json().catch(() => ({}));
@@ -30,6 +31,7 @@ export async function POST(request) {
     createdAt: new Date().toISOString()
   };
   await saveUser(email, user);
+  await ensurePage(user);
 
   const res = NextResponse.json({ user: { name: user.name, email: user.email } });
   res.cookies.set(SESSION_COOKIE, signToken({ email: user.email, name: user.name }), sessionCookieOptions());

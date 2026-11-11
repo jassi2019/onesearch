@@ -10,8 +10,24 @@
 
 ## ✨ Features
 
-- **Unified search** — one query fans out to Openverse, Unsplash, Pexels, Pixabay and Pinterest in parallel
+### Search
+- **Unified search** — one query fans out to Openverse, Unsplash, Pexels, Pixabay and Pinterest in parallel, with cross-source deduplication
 - **Voice search** — tap the mic and speak your query (Web Speech API, Chrome/Edge/Safari)
+- **AI related-search suggestions** — via Claude (if `ANTHROPIC_API_KEY` set), falling back to the free keyless Pollinations LLM, then Datamuse
+- **Rich filters, all auto-refreshing** — orientation, color, Low/High/Ultra quality, Most relevant/Newest sort, Photos/Illustrations/Vectors type, commercial-use license
+- **In-app lightbox** — images open in a viewer with keyboard navigation instead of redirecting
+- **Resolution-choice downloads** — Low/High/Ultra HD originals plus Instagram/Story/YouTube crops rendered server-side with sharp through a signed proxy
+- **Safe search** — provider-level filters (Unsplash `content_filter=high`, Openverse `mature=false`, Pixabay SafeSearch) plus a server-side blocklist for explicit queries
+
+### Accounts & social
+- **Signup/login** — scrypt-hashed passwords, AES-encrypted user records in a private Vercel Blob store, HMAC session cookies; **Google OAuth** one-click login
+- **Profiles** — name, gender, bio, Personal/Business account type, and a cropped profile photo
+- **Creator pages** — every user gets a public page (`/u/<id>`) where they upload their own images (processed with sharp, served via an authenticated proxy)
+- **Follow system** — follow/unfollow creator pages, with follower counts and a Creators discovery page
+- **Favourites & boards** — heart images into Favourites or save them to named boards
+
+### Monetization scaffold
+- Pricing page with Free/Pro/Team tiers and a demo checkout flow (Stripe-ready)
 - **Source toggles** — include/exclude any platform with one click
 - **Filters** — orientation (landscape / portrait / square) and dominant color, mapped to each provider's native API filters
 - **Interleaved results** — results from all sources are mixed fairly so no single platform dominates the grid
@@ -142,10 +158,13 @@ OneSearch does **not** host or redistribute any images. It queries each platform
 
 ## 🛠️ Tech Stack
 
-- [Next.js 14](https://nextjs.org/) (App Router)
+- [Next.js 14](https://nextjs.org/) (App Router + middleware auth gating)
 - React 18
-- Plain CSS (no framework — masonry via CSS columns)
-- Official REST APIs: Unsplash, Pexels, Pixabay
+- Plain CSS (no framework — masonry via CSS columns, animated 3D background)
+- [sharp](https://sharp.pixelplumbing.com/) for server-side image resizing
+- [Vercel Blob](https://vercel.com/docs/vercel-blob) (private store) for users, creator pages and uploads
+- Official REST APIs: Unsplash, Pexels, Pixabay, Openverse, Pinterest
+- Google OAuth 2.0 for social login
 
 ## ☁️ Deployment
 

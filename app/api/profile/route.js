@@ -8,8 +8,10 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions
 } from "../../../lib/auth";
+import { ensurePage, pageIdFor } from "../../../lib/pages";
 
 const GENDERS = ["male", "female", "other", "prefer_not_to_say"];
+const ACCOUNT_TYPES = ["personal", "business"];
 
 function session() {
   const token = cookies().get(SESSION_COOKIE)?.value;
@@ -22,6 +24,8 @@ const publicProfile = (u) => ({
   gender: u.gender || "",
   bio: u.bio || "",
   dp: u.dp || "",
+  accountType: u.accountType || "personal",
+  pageId: pageIdFor(u.email),
   google: Boolean(u.google),
   createdAt: u.createdAt
 });
@@ -70,7 +74,15 @@ export async function PUT(request) {
     user.dp = dp;
   }
 
+  if (body.accountType !== undefined) {
+    if (!ACCOUNT_TYPES.includes(body.accountType)) {
+      return NextResponse.json({ error: "Invalid account type" }, { status: 400 });
+    }
+    user.accountType = body.accountType;
+  }
+
   await saveUser(user.email, user);
+  await ensurePage(user);
 
   const res = NextResponse.json({ profile: publicProfile(user) });
   res.cookies.set(

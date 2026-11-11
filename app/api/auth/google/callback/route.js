@@ -7,6 +7,7 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions
 } from "../../../../../lib/auth";
+import { ensurePage } from "../../../../../lib/pages";
 
 export async function GET(request) {
   const url = new URL(request.url);
@@ -50,6 +51,7 @@ export async function GET(request) {
         createdAt: new Date().toISOString()
       };
       await saveUser(info.email, user);
+      await ensurePage(user);
     }
 
     const res = NextResponse.redirect(`${origin}/`);
