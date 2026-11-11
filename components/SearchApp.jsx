@@ -5,6 +5,7 @@ import ImageGrid from "./ImageGrid";
 
 const SOURCES = ["openverse", "unsplash", "pexels", "pixabay", "pinterest"];
 const TRENDING = ["nature", "business", "food", "travel", "technology", "fashion", "abstract"];
+const SKELETON_HEIGHTS = [240, 320, 190, 280, 350, 210, 260, 300, 220, 340, 200, 270];
 const ORIENTATIONS = ["any", "landscape", "portrait", "square"];
 const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "white", "gray"];
 
@@ -17,6 +18,7 @@ export default function SearchApp() {
   const [sourceStats, setSourceStats] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadingNew, setLoadingNew] = useState(false);
   const [searched, setSearched] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
@@ -29,18 +31,21 @@ export default function SearchApp() {
   }, []);
 
   const runSearch = useCallback(
-    async (nextPage = 1, overrideQuery) => {
+    async (nextPage = 1, overrideQuery, overrides = {}) => {
       const q = (overrideQuery ?? query).trim();
       if (!q || !activeSources.length) return;
+      const ori = overrides.orientation ?? orientation;
+      const col = overrides.color ?? color;
       setLoading(true);
+      if (nextPage === 1) setLoadingNew(true);
       try {
         const params = new URLSearchParams({
           q,
           page: String(nextPage),
           sources: activeSources.join(",")
         });
-        if (orientation !== "any") params.set("orientation", orientation);
-        if (color !== "any") params.set("color", color);
+        if (ori !== "any") params.set("orientation", ori);
+        if (col !== "any") params.set("color", col);
 
         const res = await fetch(`/api/search?${params}`);
         const data = await res.json();
@@ -61,6 +66,7 @@ export default function SearchApp() {
         console.error(err);
       } finally {
         setLoading(false);
+        setLoadingNew(false);
       }
     },
     [query, orientation, color]
@@ -123,19 +129,33 @@ export default function SearchApp() {
           </button>
         )}
         <button type="submit" disabled={loading}>
-          {loading ? "…" : "Search"}
+          {loading ? <span className="spinner" /> : "Search"}
         </button>
       </form>
 
       <div className="filters">
-        <select value={orientation} onChange={(e) => setOrientation(e.target.value)}>
+        <select
+          value={orientation}
+          onChange={(e) => {
+            const v = e.target.value;
+            setOrientation(v);
+            if (searched) runSearch(1, undefined, { orientation: v });
+          }}
+        >
           {ORIENTATIONS.map((o) => (
             <option key={o} value={o}>
               {o === "any" ? "Any orientation" : o}
             </option>
           ))}
         </select>
-        <select value={color} onChange={(e) => setColor(e.target.value)}>
+        <select
+          value={color}
+          onChange={(e) => {
+            const v = e.target.value;
+            setColor(v);
+            if (searched) runSearch(1, undefined, { color: v });
+          }}
+        >
           {COLORS.map((c) => (
             <option key={c} value={c}>
               {c === "any" ? "Any color" : c}
@@ -195,11 +215,23 @@ export default function SearchApp() {
         <p className="empty">No results. Try another search.</p>
       )}
 
-      <ImageGrid images={images} />
+      {loadingNew ? (
+        <div className="grid">
+          {SKELETON_HEIGHTS.map((h, i) => (
+            <div
+              className="skel-card"
+              key={i}
+              style={{ height: h, animationDelay: `${i * 70}ms` }}
+            />
+          ))}
+        </div>
+      ) : (
+        <ImageGrid images={images} />
+      )}
 
-      {images.length > 0 && (
+      {images.length > 0 && !loadingNew && (
         <button className="load-more" onClick={() => runSearch(page + 1)} disabled={loading}>
-          {loading ? "Loading…" : "Load more"}
+          {loading ? <span className="spinner dark" /> : "Load more"}
         </button>
       )}
     </>
