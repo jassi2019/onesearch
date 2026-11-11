@@ -9,7 +9,7 @@ const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "whi
 
 export default function SearchApp() {
   const [query, setQuery] = useState("");
-  const [activeSources, setActiveSources] = useState(SOURCES);
+  const activeSources = SOURCES;
   const [orientation, setOrientation] = useState("any");
   const [color, setColor] = useState("any");
   const [images, setImages] = useState([]);
@@ -26,12 +26,6 @@ export default function SearchApp() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SR) setVoiceSupported(true);
   }, []);
-
-  const toggleSource = (s) => {
-    setActiveSources((prev) =>
-      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
-    );
-  };
 
   const runSearch = useCallback(
     async (nextPage = 1, overrideQuery) => {
@@ -68,7 +62,7 @@ export default function SearchApp() {
         setLoading(false);
       }
     },
-    [query, activeSources, orientation, color]
+    [query, orientation, color]
   );
 
   const startVoiceSearch = useCallback(() => {
@@ -133,15 +127,6 @@ export default function SearchApp() {
       </form>
 
       <div className="filters">
-        {SOURCES.map((s) => (
-          <span
-            key={s}
-            className={`chip ${activeSources.includes(s) ? "active" : ""}`}
-            onClick={() => toggleSource(s)}
-          >
-            {s}
-          </span>
-        ))}
         <select value={orientation} onChange={(e) => setOrientation(e.target.value)}>
           {ORIENTATIONS.map((o) => (
             <option key={o} value={o}>
@@ -188,7 +173,7 @@ export default function SearchApp() {
       )}
 
       {searched && !loading && images.length === 0 && (
-        <p className="empty">No results. Try another query or enable more sources.</p>
+        <p className="empty">No results. Try another search.</p>
       )}
 
       <ImageGrid images={images} />

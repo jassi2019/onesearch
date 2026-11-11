@@ -7,7 +7,7 @@ const PLANS = [
     name: "Free",
     price: "₹0",
     period: "forever",
-    features: ["50 searches / day", "Free sources (Openverse, Unsplash, Pixabay)", "Standard downloads", "Community support"],
+    features: ["50 searches / day", "Standard image library", "Standard downloads", "Community support"],
     cta: "Current plan",
     current: true
   },
@@ -15,7 +15,7 @@ const PLANS = [
     name: "Pro",
     price: "₹499",
     period: "/month",
-    features: ["Unlimited searches", "All sources incl. Pinterest", "Voice search", "High-res downloads", "No ads", "Email support"],
+    features: ["Unlimited searches", "Full image library", "Voice search", "High-res downloads", "No ads", "Email support"],
     cta: "Upgrade to Pro",
     highlight: true
   },
