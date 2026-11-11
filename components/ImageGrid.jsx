@@ -42,9 +42,14 @@ export default function ImageGrid({ images, quality = "high" }) {
     <div className="grid">
       {images.map((img, idx) => (
         <figure className="card" key={img.id}>
-          <button className="img-open" onClick={() => setLightbox(idx)} aria-label="Open image">
+          <button
+            className="img-open"
+            onClick={() => setLightbox(idx)}
+            onContextMenu={(e) => e.preventDefault()}
+            aria-label="Open image"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.srcs?.[quality] || img.thumb} alt={img.alt} loading="lazy" />
+            <img src={img.srcs?.[quality] || img.thumb} alt={img.alt} loading="lazy" draggable={false} />
           </button>
           <div className="card-overlay" />
           <div className="card-actions">

@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { randomUUID } from "crypto";
 import { verifyToken, SESSION_COOKIE } from "../../../lib/auth";
 import { getPage, savePage, pageIdFor } from "../../../lib/pages";
+import { addNotification } from "../../../lib/notifications";
 
 function session() {
   const token = cookies().get(SESSION_COOKIE)?.value;
@@ -80,6 +81,14 @@ export async function POST(request) {
   page.images = page.images || [];
   page.images.unshift({ id: imageId, title, createdAt: new Date().toISOString() });
   await savePage(page);
+
+  for (const follower of (page.followers || []).slice(0, 20)) {
+    await addNotification(follower, {
+      type: "upload",
+      text: `${page.name} uploaded a new image`,
+      fromPageId: pageId
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ image: page.images[0] });
 }

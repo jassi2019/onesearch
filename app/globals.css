@@ -177,6 +177,11 @@ a {
   color: inherit;
 }
 
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 .container {
   max-width: 1280px;
   margin: 0 auto;
@@ -260,6 +265,110 @@ a {
   font-weight: 700;
   height: 28px;
   width: 28px;
+}
+
+.bell-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.bell {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.bell:hover {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.bell-badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  background: var(--grad);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 16px;
+  padding: 3px 4px;
+  text-align: center;
+}
+
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 310px;
+  max-height: 380px;
+  overflow-y: auto;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  z-index: 60;
+  animation: rise 0.2s ease both;
+}
+
+.notif-head {
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 13px 16px;
+}
+
+.notif-empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.notif-item {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 12px 16px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.notif-item:hover {
+  background: rgba(124, 92, 255, 0.1);
+}
+
+.notif-item.unread {
+  background: rgba(124, 92, 255, 0.08);
+}
+
+.notif-item small {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.notif-icon {
+  font-size: 16px;
 }
 
 .nav-logout {

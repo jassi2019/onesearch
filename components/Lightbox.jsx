@@ -85,7 +85,13 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
 
       <div className="lightbox" onClick={(e) => e.stopPropagation()}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="lb-img" src={img.srcs?.[quality] || img.full || img.thumb} alt={img.alt} />
+        <img
+          className="lb-img"
+          src={img.srcs?.[quality] || img.full || img.thumb}
+          alt={img.alt}
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
+        />
 
         <div className="lb-bar">
           <div className="lb-actions">

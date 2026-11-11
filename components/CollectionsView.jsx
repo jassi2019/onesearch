@@ -49,7 +49,7 @@ export default function CollectionsView() {
                   aria-label="Open image"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img.thumb} alt={img.alt} loading="lazy" />
+                  <img src={img.thumb} alt={img.alt} loading="lazy" draggable={false} onContextMenu={(e) => e.preventDefault()} />
                 </button>
                 <div className="card-overlay" />
                 <div className="card-actions">

@@ -139,6 +139,8 @@ export default function UserPage({ pageId }) {
                 src={`/api/uploads/file/${page.pageId}/${img.id}`}
                 alt={img.title || "Upload"}
                 loading="lazy"
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
                 style={{ display: "block", width: "100%" }}
               />
               {isOwner && (

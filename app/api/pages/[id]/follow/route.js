@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken, SESSION_COOKIE } from "../../../../../lib/auth";
 import { getPage, savePage, pageIdFor } from "../../../../../lib/pages";
+import { addNotification } from "../../../../../lib/notifications";
 
 export async function POST(request, { params }) {
   const token = cookies().get(SESSION_COOKIE)?.value;
@@ -23,5 +24,14 @@ export async function POST(request, { params }) {
   else page.followers.splice(i, 1);
 
   await savePage(page);
+
+  if (following) {
+    await addNotification(params.id, {
+      type: "follow",
+      text: `${session.name} started following your page`,
+      fromPageId: myId
+    }).catch(() => {});
+  }
+
   return NextResponse.json({ isFollowing: following, followerCount: page.followers.length });
 }
