@@ -193,9 +193,15 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 20px 20px 0;
+  gap: 12px;
+  width: min(1280px, calc(100% - 32px));
+  margin: 14px auto 0;
+  padding: 8px 10px 8px 20px;
+  background: var(--panel);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 
 .brand {
@@ -215,7 +221,8 @@ img {
 
 .nav-links {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 4px;
 }
 
 .nav-links a {
@@ -915,10 +922,22 @@ img {
 /* ===== Filters / chips ===== */
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+  flex-wrap: nowrap;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 8px);
+  margin: 18px auto 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filters > * {
+  flex-shrink: 0;
 }
 
 .filters select {
@@ -929,8 +948,8 @@ img {
   color: var(--muted);
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
-  padding: 9px 16px;
+  font-size: 12.5px;
+  padding: 8px 14px;
   transition: all 0.2s;
 }
 
@@ -970,11 +989,23 @@ img {
 
 .suggestions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  width: max-content;
+  max-width: calc(100% - 8px);
+  margin: 16px auto 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.suggestions::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestions > * {
+  flex-shrink: 0;
 }
 
 .suggestions > span:first-child {
@@ -1710,17 +1741,21 @@ footer a:hover {
 @media (max-width: 720px) {
   .topnav {
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 12px 12px 0;
+    justify-content: center;
+    gap: 6px;
+    width: calc(100% - 20px);
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 22px;
   }
 
   .brand {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .nav-links {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 2px;
   }
 
@@ -1784,16 +1819,12 @@ footer a:hover {
   }
 
   .filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin: 14px auto 0;
-    max-width: 440px;
+    max-width: calc(100vw - 24px);
+    margin-top: 14px;
   }
 
-  .filters select {
-    width: 100%;
-    text-align: center;
+  .suggestions {
+    max-width: calc(100vw - 24px);
   }
 
   .page-head {
