@@ -51,16 +51,7 @@ export default function CollectionsView() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.thumb} alt={img.alt} loading="lazy" />
                 </button>
-                <div className="card-overlay">
-                  <a
-                    className="ph-chip"
-                    href={img.photographerUrl || img.pageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {img.photographer}
-                  </a>
-                </div>
+                <div className="card-overlay" />
                 <div className="card-actions">
                   {img.dl && (
                     <a className="act" href={img.dl} title="Download image">

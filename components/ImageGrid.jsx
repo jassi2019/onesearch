@@ -45,16 +45,7 @@ export default function ImageGrid({ images, quality = "high" }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.srcs?.[quality] || img.thumb} alt={img.alt} loading="lazy" />
           </button>
-          <div className="card-overlay">
-            <a
-              className="ph-chip"
-              href={img.photographerUrl || img.pageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {img.photographer}
-            </a>
-          </div>
+          <div className="card-overlay" />
           <div className="card-actions">
             <button
               className="act"

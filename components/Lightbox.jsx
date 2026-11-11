@@ -87,12 +87,6 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
         <img className="lb-img" src={img.srcs?.[quality] || img.full || img.thumb} alt={img.alt} />
 
         <div className="lb-bar">
-          <div className="lb-info">
-            <a href={img.photographerUrl || img.pageUrl} target="_blank" rel="noopener noreferrer">
-              {img.photographer}
-            </a>
-          </div>
-
           <div className="lb-actions">
             <div className="lb-menu-wrap">
               <button
@@ -163,14 +157,6 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
               </div>
             )}
 
-            <a
-              className="lb-btn ghost"
-              href={img.pageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Source ↗
-            </a>
           </div>
         </div>
       </div>
