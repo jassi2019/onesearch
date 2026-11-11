@@ -30,6 +30,50 @@ function looksAiGenerated(buffer) {
   return AI_MARKERS.some((m) => sample.includes(m));
 }
 
+// Pixel-level AI detection via Sightengine (catches cropped/metadata-stripped
+// AI images). Runs only when API keys are configured; free tier: 500/month.
+async function sightengineAiScore(buffer) {
+  const user = process.env.SIGHTENGINE_API_USER;
+  const secret = process.env.SIGHTENGINE_API_SECRET;
+  if (!user || !secret) return null;
+  try {
+    const form = new FormData();
+    form.append("media", new Blob([buffer], { type: "image/jpeg" }), "upload.jpg");
+    form.append("models", "genai");
+    form.append("api_user", user);
+    form.append("api_secret", secret);
+    const res = await fetch("https://api.sightengine.com/1.0/check.json", {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.type?.ai_generated ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const xmlEscape = (s) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function watermarkSvg(width, height, text) {
+  const safe = xmlEscape(text);
+  const corner = Math.max(14, Math.round(width / 42));
+  const center = Math.max(26, Math.round(width / 14));
+  return Buffer.from(
+    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${center}" font-weight="bold"
+        fill="rgba(255,255,255,0.16)" text-anchor="middle"
+        transform="rotate(-28 ${width / 2} ${height / 2})">${safe}</text>
+      <text x="${width - 12}" y="${height - 12}" font-family="Arial, sans-serif" font-size="${corner}"
+        font-weight="bold" fill="rgba(255,255,255,0.85)" stroke="rgba(0,0,0,0.4)" stroke-width="1"
+        text-anchor="end">${safe}</text>
+    </svg>`
+  );
+}
+
 export async function POST(request) {
   const s = session();
   if (!s) return NextResponse.json({ error: "Not logged in" }, { status: 401 });
@@ -54,11 +98,25 @@ export async function POST(request) {
     );
   }
 
+  const aiScore = await sightengineAiScore(input);
+  if (aiScore !== null && aiScore >= 0.5) {
+    return NextResponse.json(
+      { error: "Our AI detector flagged this as an AI-generated image — only original photos are allowed" },
+      { status: 422 }
+    );
+  }
+
   let output;
   try {
-    output = await sharp(input)
+    const resized = await sharp(input)
       .rotate()
       .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 86 })
+      .toBuffer();
+    const meta = await sharp(resized).metadata();
+    const label = `© ${s.name} • OneSearch`;
+    output = await sharp(resized)
+      .composite([{ input: watermarkSvg(meta.width, meta.height, label) }])
       .jpeg({ quality: 86 })
       .toBuffer();
   } catch {
