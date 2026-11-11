@@ -18,7 +18,11 @@ const AI_MARKERS = [
   "stable diffusion", "stable-diffusion", "sdxl", "sd-webui", "automatic1111",
   "comfyui", "invokeai", "novelai", "midjourney", "dall-e", "dall·e", "dalle",
   "adobe firefly", "firefly image", "leonardo.ai", "ideogram", "flux.1",
-  "c2pa.ai", "trainedalgorithmicmedia", "\"prompt\":", "negative prompt:"
+  "c2pa.ai", "trainedalgorithmicmedia", "\"prompt\":", "negative prompt:",
+  // AI-edited / partially generated (C2PA composite marker, generative fill)
+  "compositewithtrainedalgorithmicmedia", "generative fill", "generativefill",
+  "stability.ai", "stabilityai", "dreamstudio", "runwayml", "krea.ai",
+  "recraft.ai", "gpt-image", "bing image creator"
 ];
 
 function looksAiGenerated(buffer) {
@@ -45,7 +49,7 @@ export async function POST(request) {
 
   if (looksAiGenerated(input)) {
     return NextResponse.json(
-      { error: "AI-generated images are not allowed on creator pages" },
+      { error: "AI-generated or AI-edited images are not allowed on creator pages" },
       { status: 422 }
     );
   }
