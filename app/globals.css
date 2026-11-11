@@ -1,12 +1,12 @@
 :root {
-  --bg: #08090f;
-  --panel: rgba(255, 255, 255, 0.045);
-  --panel-solid: #12141d;
-  --border: rgba(255, 255, 255, 0.09);
-  --text: #f4f5f8;
-  --muted: #9aa2b1;
-  --accent: #8b7bff;
-  --accent-strong: #6d5cf5;
+  --bg: #f6f7fc;
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-solid: #ffffff;
+  --border: rgba(30, 36, 70, 0.1);
+  --text: #1a1e2e;
+  --muted: #5f6678;
+  --accent: #6d5cf5;
+  --accent-strong: #5b49e8;
   --pink: #ff5e8e;
   --grad: linear-gradient(135deg, #7c5cff 0%, #b05cff 50%, #ff5e8e 100%);
   --radius: 14px;
@@ -21,7 +21,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
   scroll-behavior: smooth;
 }
 
@@ -47,9 +47,9 @@ body {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(45% 40% at 20% 10%, rgba(124, 92, 255, 0.28), transparent 70%),
-    radial-gradient(50% 45% at 85% 5%, rgba(255, 94, 142, 0.2), transparent 70%),
-    radial-gradient(55% 50% at 50% 105%, rgba(64, 145, 255, 0.18), transparent 70%);
+    radial-gradient(45% 40% at 20% 10%, rgba(124, 92, 255, 0.18), transparent 70%),
+    radial-gradient(50% 45% at 85% 5%, rgba(255, 94, 142, 0.14), transparent 70%),
+    radial-gradient(55% 50% at 50% 105%, rgba(64, 145, 255, 0.12), transparent 70%);
   animation: aurora-shift 16s ease-in-out infinite alternate;
 }
 
@@ -131,8 +131,8 @@ body {
   bottom: -14%;
   height: 55%;
   background-image:
-    linear-gradient(rgba(139, 123, 255, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 123, 255, 0.22) 1px, transparent 1px);
+    linear-gradient(rgba(109, 92, 245, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(109, 92, 245, 0.2) 1px, transparent 1px);
   background-size: 54px 54px;
   transform: perspective(620px) rotateX(62deg);
   transform-origin: center top;
@@ -254,13 +254,13 @@ a {
   border: 1px solid var(--border);
   border-radius: 18px;
   backdrop-filter: blur(14px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 36px rgba(26, 30, 70, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-bar:focus-within {
-  border-color: rgba(139, 123, 255, 0.55);
-  box-shadow: 0 10px 44px rgba(109, 92, 245, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: rgba(109, 92, 245, 0.5);
+  box-shadow: 0 12px 40px rgba(109, 92, 245, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .search-bar input {
@@ -276,7 +276,7 @@ a {
 }
 
 .search-bar input::placeholder {
-  color: #737b8c;
+  color: #9299ab;
 }
 
 .search-bar button[type="submit"] {
@@ -435,8 +435,8 @@ a {
 }
 
 .card:hover {
-  border-color: rgba(139, 123, 255, 0.45);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  border-color: rgba(109, 92, 245, 0.4);
+  box-shadow: 0 18px 44px rgba(26, 30, 70, 0.16);
   transform: translateY(-4px);
 }
 
@@ -541,7 +541,7 @@ button.dl {
   background: var(--panel-solid);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 14px 36px rgba(26, 30, 70, 0.18);
   display: grid;
   min-width: 200px;
   overflow: hidden;
@@ -631,7 +631,7 @@ button.dl {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -639,7 +639,7 @@ button.dl {
 }
 
 .spinner.dark {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(26, 30, 70, 0.15);
   border-top-color: var(--accent);
 }
 
@@ -650,9 +650,9 @@ button.dl {
 .skel-card {
   background: linear-gradient(
     100deg,
-    rgba(255, 255, 255, 0.045) 40%,
-    rgba(139, 123, 255, 0.14) 50%,
-    rgba(255, 255, 255, 0.045) 60%
+    rgba(26, 30, 70, 0.05) 40%,
+    rgba(109, 92, 245, 0.13) 50%,
+    rgba(26, 30, 70, 0.05) 60%
   );
   background-size: 200% 100%;
   border: 1px solid var(--border);
@@ -737,7 +737,7 @@ footer a:hover {
 
 .plan:hover {
   transform: translateY(-5px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 18px 50px rgba(26, 30, 70, 0.14);
 }
 
 .plan.highlight {
@@ -823,7 +823,7 @@ footer a:hover {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 3, 6, 0.7);
+  background: rgba(20, 24, 50, 0.45);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;

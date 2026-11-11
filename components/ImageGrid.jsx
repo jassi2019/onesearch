@@ -11,7 +11,7 @@ const DL_PRESETS = [
   { key: "yt", label: "YouTube 1280×720" }
 ];
 
-export default function ImageGrid({ images }) {
+export default function ImageGrid({ images, quality = "high" }) {
   const [menu, setMenu] = useState(null); // { id, type: "dl" | "save" }
   const [flash, setFlash] = useState(null);
   const [newBoard, setNewBoard] = useState("");
@@ -38,7 +38,7 @@ export default function ImageGrid({ images }) {
         <figure className="card" key={img.id}>
           <button className="img-open" onClick={() => setLightbox(idx)} aria-label="Open image">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.thumb} alt={img.alt} loading="lazy" />
+            <img src={img.srcs?.[quality] || img.thumb} alt={img.alt} loading="lazy" />
           </button>
           <figcaption className="meta">
             <a href={img.photographerUrl || img.pageUrl} target="_blank" rel="noopener noreferrer">
@@ -68,15 +68,18 @@ export default function ImageGrid({ images }) {
 
           {menu && menu.id === img.id && menu.type === "dl" && (
             <div className="card-menu">
-              {DL_PRESETS.map((p) => (
-                <a
-                  key={p.key}
-                  href={p.key ? `${img.dl}&size=${p.key}` : img.dl}
-                  onClick={() => setMenu(null)}
-                >
-                  {p.label}
-                </a>
-              ))}
+              {DL_PRESETS.map((p) => {
+                const base = img.dls?.[quality] || img.dl;
+                return (
+                  <a
+                    key={p.key}
+                    href={p.key ? `${base}&size=${p.key}` : base}
+                    onClick={() => setMenu(null)}
+                  >
+                    {p.label}
+                  </a>
+                );
+              })}
             </div>
           )}
 
@@ -109,6 +112,7 @@ export default function ImageGrid({ images }) {
       {lightbox !== null && (
         <Lightbox
           images={images}
+          quality={quality}
           index={lightbox}
           onClose={() => setLightbox(null)}
           onNavigate={(dir) =>

@@ -10,7 +10,7 @@ const DL_PRESETS = [
   { key: "yt", label: "YouTube 1280×720" }
 ];
 
-export default function Lightbox({ images, index, onClose, onNavigate }) {
+export default function Lightbox({ images, index, onClose, onNavigate, quality = "high" }) {
   const img = images[index];
   const [menu, setMenu] = useState(null);
   const [newBoard, setNewBoard] = useState("");
@@ -79,7 +79,7 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
 
       <div className="lightbox" onClick={(e) => e.stopPropagation()}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="lb-img" src={img.full || img.thumb} alt={img.alt} />
+        <img className="lb-img" src={img.srcs?.[quality] || img.full || img.thumb} alt={img.alt} />
 
         <div className="lb-bar">
           <div className="lb-info">
@@ -131,15 +131,18 @@ export default function Lightbox({ images, index, onClose, onNavigate }) {
                 </button>
                 {menu === "dl" && (
                   <div className="card-menu">
-                    {DL_PRESETS.map((p) => (
-                      <a
-                        key={p.key}
-                        href={p.key ? `${img.dl}&size=${p.key}` : img.dl}
-                        onClick={() => setMenu(null)}
-                      >
-                        {p.label}
-                      </a>
-                    ))}
+                    {DL_PRESETS.map((p) => {
+                      const base = img.dls?.[quality] || img.dl;
+                      return (
+                        <a
+                          key={p.key}
+                          href={p.key ? `${base}&size=${p.key}` : base}
+                          onClick={() => setMenu(null)}
+                        >
+                          {p.label}
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -22,9 +22,13 @@ export async function GET(request) {
 
   try {
     const data = await aggregateSearch({ query, sources, page, perPage, orientation, color });
+    const sign = (u) => (u ? `/api/download?u=${encodeURIComponent(u)}&s=${signUrl(u)}` : null);
     data.results = data.results.map((r) => ({
       ...r,
-      dl: r.full ? `/api/download?u=${encodeURIComponent(r.full)}&s=${signUrl(r.full)}` : null
+      dl: sign(r.full),
+      dls: r.srcs
+        ? { low: sign(r.srcs.low), high: sign(r.srcs.high), ultra: sign(r.srcs.ultra) }
+        : null
     }));
     return NextResponse.json(data);
   } catch (err) {

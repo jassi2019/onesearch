@@ -14,6 +14,7 @@ export default function SearchApp() {
   const activeSources = SOURCES;
   const [orientation, setOrientation] = useState("any");
   const [color, setColor] = useState("any");
+  const [quality, setQuality] = useState("high");
   const [images, setImages] = useState([]);
   const [sourceStats, setSourceStats] = useState([]);
   const [page, setPage] = useState(1);
@@ -162,6 +163,11 @@ export default function SearchApp() {
             </option>
           ))}
         </select>
+        <select value={quality} onChange={(e) => setQuality(e.target.value)}>
+          <option value="low">Low quality</option>
+          <option value="high">High quality</option>
+          <option value="ultra">Ultra quality</option>
+        </select>
       </div>
 
       {!searched && (
@@ -226,7 +232,7 @@ export default function SearchApp() {
           ))}
         </div>
       ) : (
-        <ImageGrid images={images} />
+        <ImageGrid images={images} quality={quality} />
       )}
 
       {images.length > 0 && !loadingNew && (
