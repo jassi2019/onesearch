@@ -715,11 +715,21 @@ function Creator({ groups, preset, presetKey }) {
       track = stream.getVideoTracks()[0];
     }
 
-    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    // Prefer MP4 (plays everywhere, esp. mobile/WhatsApp); WebM as fallback
+    const types = [
+      "video/mp4;codecs=avc1.42E01E",
+      "video/mp4",
+      "video/webm;codecs=vp9",
+      "video/webm"
+    ];
+    const mime = types.find((ty) => MediaRecorder.isTypeSupported(ty)) || "";
+    const ext = mime.includes("mp4") ? "mp4" : "webm";
+
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
     const chunks = [];
     rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
     rec.onstop = () => {
-      saveBlob(new Blob(chunks, { type: "video/webm" }), "my-emoji.webm");
+      saveBlob(new Blob(chunks, { type: mime || "video/webm" }), `my-emoji.${ext}`);
       setRecording(false);
     };
     rec.start();
