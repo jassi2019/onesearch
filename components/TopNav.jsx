@@ -55,6 +55,7 @@ export default function TopNav() {
         One<span>Search</span>
       </a>
       <div className="nav-links">
+        <a href="/emoji">Emoji</a>
         <a href="/creators">Creators</a>
         <a href="/collections">Collections</a>
         <a href="/pricing">Pricing</a>
