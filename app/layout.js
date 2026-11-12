@@ -1,5 +1,6 @@
 import { Outfit, Inter } from "next/font/google";
 import Script from "next/script";
+import PwaRegister from "../components/PwaRegister";
 import "./globals.css";
 
 const GA_ID = "G-88S0167W4K";
@@ -10,7 +11,27 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata = {
   title: "OneSearch — Image Search Aggregator",
-  description: "Search millions of free, high-quality images from one place."
+  description: "Search millions of free, high-quality images from one place.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }
+    ],
+    apple: "/icons/apple-touch-icon.png"
+  },
+  appleWebApp: {
+    capable: true,
+    title: "OneSearch",
+    statusBarStyle: "black-translucent"
+  }
+};
+
+export const viewport = {
+  themeColor: "#0b0c12",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
 };
 
 export default function RootLayout({ children }) {
@@ -46,6 +67,7 @@ export default function RootLayout({ children }) {
             gtag('config', '${GA_ID}');
           `}
         </Script>
+        <PwaRegister />
         <div className="bg-fx" aria-hidden="true">
           <div className="aurora" />
           <div className="orb orb-1" />
