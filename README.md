@@ -1,6 +1,6 @@
 # OneSearch 🔍🖼️
 
-**Live demo:** https://onesearch-lakshaymehra-pixels-projects.vercel.app
+**Live demo:** https://onesearch-lm.vercel.app
 
 **A meta image search engine** — search multiple free stock-photo platforms (Openverse, Unsplash, Pexels, Pixabay) from a single search bar, with unified filters and a Pinterest-style masonry grid.
 
