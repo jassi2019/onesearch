@@ -210,34 +210,96 @@ function Library({ groups }) {
 }
 
 const BG_SHAPES = ["circle", "rounded", "square", "none"];
-const MOTIONS = ["none", "bounce", "spin", "pulse", "shake", "wave", "heartbeat", "pop", "swing"];
+const MOTIONS = [
+  "none", "bounce", "float", "pulse", "heartbeat", "pop", "zoom", "spin", "swing",
+  "wave", "shake", "wobble", "jello", "tada", "rubber", "flip", "orbit", "slide",
+  "drop", "blink", "flash"
+];
+
+function easeOutBounce(x) {
+  const n1 = 7.5625;
+  const d1 = 2.75;
+  if (x < 1 / d1) return n1 * x * x;
+  if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + 0.75;
+  if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + 0.9375;
+  return n1 * (x -= 2.625 / d1) * x + 0.984375;
+}
+
+const TAU = Math.PI * 2;
 
 function motionTransform(motion, t) {
+  const base = { dx: 0, dy: 0, rot: 0, scale: 1, scaleX: null, scaleY: null, alpha: 1 };
   switch (motion) {
+    case "bounce":
+      return { ...base, dy: -Math.abs(Math.sin((t * Math.PI) / 0.6)) * 34 };
+    case "float":
+      return { ...base, dy: Math.sin((t * TAU) / 2.4) * 14 };
+    case "pulse":
+      return { ...base, scale: 1 + 0.14 * Math.sin(t * TAU) };
     case "heartbeat": {
-      const p = (t % 1) * Math.PI * 2;
+      const p = (t % 1) * TAU;
       const beat = Math.max(0, Math.sin(p)) ** 3 + 0.7 * Math.max(0, Math.sin(p + 2.1)) ** 8;
-      return { dx: 0, dy: 0, rot: 0, scale: 1 + 0.2 * beat };
+      return { ...base, scale: 1 + 0.2 * beat };
     }
     case "pop": {
       const p = (t % 1.3) / 1.3;
       const s = p < 0.35 ? 0.55 + 0.45 * Math.sin((p / 0.35) * Math.PI * 0.5) * 1.35 : 1;
-      return { dx: 0, dy: 0, rot: 0, scale: Math.min(s, 1.18) };
+      return { ...base, scale: Math.min(s, 1.18) };
     }
-    case "swing":
-      return { dx: Math.sin(t * Math.PI * 1.25) * 14, dy: 0, rot: Math.sin(t * Math.PI * 1.25) * 20, scale: 1 };
-    case "bounce":
-      return { dx: 0, dy: -Math.abs(Math.sin(t * Math.PI / 0.6)) * 34, rot: 0, scale: 1 };
+    case "zoom":
+      return { ...base, scale: 0.75 + 0.35 * (0.5 + 0.5 * Math.sin((t * TAU) / 1.6)) };
     case "spin":
-      return { dx: 0, dy: 0, rot: (t * 360) / 2, scale: 1 };
-    case "pulse":
-      return { dx: 0, dy: 0, rot: 0, scale: 1 + 0.14 * Math.sin(t * Math.PI * 2) };
-    case "shake":
-      return { dx: Math.sin(t * 42) * 9, dy: 0, rot: Math.sin(t * 42) * 5, scale: 1 };
+      return { ...base, rot: (t * 360) / 2 };
+    case "swing": {
+      const s = Math.sin(t * Math.PI * 1.25);
+      return { ...base, dx: s * 14, rot: s * 20 };
+    }
     case "wave":
-      return { dx: 0, dy: Math.sin(t * Math.PI) * 16, rot: Math.sin(t * Math.PI) * 10, scale: 1 };
+      return { ...base, dy: Math.sin(t * Math.PI) * 16, rot: Math.sin(t * Math.PI) * 10 };
+    case "shake":
+      return { ...base, dx: Math.sin(t * 42) * 9, rot: Math.sin(t * 42) * 5 };
+    case "wobble": {
+      const p = Math.sin((t * TAU) / 1.2);
+      return { ...base, dx: p * 24, rot: p * 9 };
+    }
+    case "jello": {
+      const s = Math.sin((t * TAU) / 1.1);
+      return { ...base, scaleX: 1 + 0.2 * s, scaleY: 1 - 0.2 * s };
+    }
+    case "tada": {
+      const p = (t % 1.5) / 1.5;
+      if (p < 0.12) return { ...base, scale: 1 - 0.1 * Math.sin((p / 0.12) * Math.PI) };
+      if (p < 0.6)
+        return { ...base, scale: 1.12, rot: Math.sin(((p - 0.12) / 0.48) * Math.PI * 6) * 8 };
+      return base;
+    }
+    case "rubber": {
+      const p = (t % 1.2) / 1.2;
+      const k = Math.sin(p * TAU) * (1 - p);
+      return { ...base, scaleX: 1 + 0.3 * k, scaleY: 1 - 0.3 * k };
+    }
+    case "flip": {
+      const c = Math.cos((t * TAU) / 1.8);
+      const sx = Math.sign(c || 1) * Math.max(Math.abs(c), 0.06);
+      return { ...base, scaleX: sx, scaleY: 1 };
+    }
+    case "orbit":
+      return { ...base, dx: Math.cos((t * TAU) / 2) * 26, dy: Math.sin((t * TAU) / 2) * 26 };
+    case "slide":
+      return { ...base, dx: Math.sin((t * TAU) / 1.8) * 60 };
+    case "drop": {
+      const p = (t % 1.4) / 1.4;
+      if (p < 0.55) return { ...base, dy: -430 * (1 - easeOutBounce(p / 0.55)) };
+      return base;
+    }
+    case "blink":
+      return { ...base, alpha: 0.25 + 0.75 * (0.5 + 0.5 * Math.sin((t * TAU) / 0.9)) };
+    case "flash": {
+      const p = t % 1.2;
+      return { ...base, alpha: p < 0.1 || (p > 0.2 && p < 0.3) ? 0.12 : 1 };
+    }
     default:
-      return { dx: 0, dy: 0, rot: 0, scale: 1 };
+      return base;
   }
 }
 
@@ -261,14 +323,17 @@ function drawScene(ctx, cfg, t) {
     ctx.fill();
   }
 
-  const m = motionTransform(cfg.motion, t);
+  const m = motionTransform(cfg.motion, t * (cfg.speed || 1));
+  const sx = m.scaleX ?? m.scale;
+  const sy = m.scaleY ?? m.scale;
 
-  const drawEmoji = (emoji, size, x, y, rot, scale = 1) => {
+  const drawEmoji = (emoji, size, x, y, rot, scX = 1, scY = 1, alpha = 1) => {
     if (!emoji) return;
     ctx.save();
+    ctx.globalAlpha = alpha;
     ctx.translate(x, y);
     ctx.rotate((rot * Math.PI) / 180);
-    ctx.scale(scale, scale);
+    ctx.scale(scX, scY);
     ctx.font = `${size}px ${EMOJI_FONT}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -282,7 +347,9 @@ function drawScene(ctx, cfg, t) {
     S / 2 + m.dx,
     S / 2 - (cfg.text ? 20 : 0) + m.dy,
     cfg.mainRot + m.rot,
-    m.scale
+    sx,
+    sy,
+    m.alpha
   );
   drawEmoji(
     cfg.overlay,
@@ -290,7 +357,9 @@ function drawScene(ctx, cfg, t) {
     S / 2 + (cfg.ovX / 100) * (S / 2 - 60) + m.dx * 0.5,
     S / 2 + (cfg.ovY / 100) * (S / 2 - 60) + m.dy * 0.5,
     m.rot * 0.5,
-    m.scale
+    sx,
+    sy,
+    m.alpha
   );
 
   if (cfg.text) {
@@ -324,7 +393,8 @@ function Creator({ groups, preset, presetKey }) {
     ovY: 60,
     text: "",
     textColor: "#ffffff",
-    motion: "none"
+    motion: "none",
+    speed: 1
   });
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
@@ -562,8 +632,8 @@ function Creator({ groups, preset, presetKey }) {
         </span>
 
         <label className="cp-label">
-          Motion
-          <span className="cp-row">
+          Motion ({MOTIONS.length - 1} effects)
+          <span className="cp-row motion-row">
             {MOTIONS.map((mo) => (
               <span
                 key={mo}
@@ -575,6 +645,20 @@ function Creator({ groups, preset, presetKey }) {
             ))}
           </span>
         </label>
+
+        {cfg.motion !== "none" && (
+          <label className="cp-label">
+            Speed — {cfg.speed}x
+            <input
+              type="range"
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={cfg.speed}
+              onChange={(e) => set("speed", +e.target.value)}
+            />
+          </label>
+        )}
 
         <label className="cp-label">
           Main emoji size <input type="range" min="80" max="440" value={cfg.mainSize} onChange={(e) => set("mainSize", +e.target.value)} />
