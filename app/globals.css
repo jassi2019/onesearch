@@ -878,6 +878,17 @@ img {
   top: 16px;
 }
 
+.dl-formats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.dl-formats .plan-cta {
+  padding: 11px 0;
+  font-size: 13px;
+}
+
 .creator-preview canvas {
   width: 100%;
   height: auto;

@@ -153,12 +153,94 @@ function Library({ groups }) {
 }
 
 const BG_SHAPES = ["circle", "rounded", "square", "none"];
+const MOTIONS = ["none", "bounce", "spin", "pulse", "shake", "wave"];
+
+function motionTransform(motion, t) {
+  switch (motion) {
+    case "bounce":
+      return { dx: 0, dy: -Math.abs(Math.sin(t * Math.PI / 0.6)) * 34, rot: 0, scale: 1 };
+    case "spin":
+      return { dx: 0, dy: 0, rot: (t * 360) / 2, scale: 1 };
+    case "pulse":
+      return { dx: 0, dy: 0, rot: 0, scale: 1 + 0.14 * Math.sin(t * Math.PI * 2) };
+    case "shake":
+      return { dx: Math.sin(t * 42) * 9, dy: 0, rot: Math.sin(t * 42) * 5, scale: 1 };
+    case "wave":
+      return { dx: 0, dy: Math.sin(t * Math.PI) * 16, rot: Math.sin(t * Math.PI) * 10, scale: 1 };
+    default:
+      return { dx: 0, dy: 0, rot: 0, scale: 1 };
+  }
+}
+
+function drawScene(ctx, cfg, t) {
+  const S = 512;
+  ctx.clearRect(0, 0, S, S);
+
+  if (cfg.bgShape !== "none") {
+    let fill = cfg.color1;
+    if (cfg.useGrad) {
+      const g = ctx.createLinearGradient(0, 0, S, S);
+      g.addColorStop(0, cfg.color1);
+      g.addColorStop(1, cfg.color2);
+      fill = g;
+    }
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    if (cfg.bgShape === "circle") ctx.arc(S / 2, S / 2, S / 2 - 6, 0, Math.PI * 2);
+    else if (cfg.bgShape === "rounded") ctx.roundRect(6, 6, S - 12, S - 12, 110);
+    else ctx.rect(6, 6, S - 12, S - 12);
+    ctx.fill();
+  }
+
+  const m = motionTransform(cfg.motion, t);
+
+  const drawEmoji = (emoji, size, x, y, rot, scale = 1) => {
+    if (!emoji) return;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((rot * Math.PI) / 180);
+    ctx.scale(scale, scale);
+    ctx.font = `${size}px ${EMOJI_FONT}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(emoji, 0, size * 0.06);
+    ctx.restore();
+  };
+
+  drawEmoji(
+    cfg.main,
+    cfg.mainSize,
+    S / 2 + m.dx,
+    S / 2 - (cfg.text ? 20 : 0) + m.dy,
+    cfg.mainRot + m.rot,
+    m.scale
+  );
+  drawEmoji(
+    cfg.overlay,
+    cfg.ovSize,
+    S / 2 + (cfg.ovX / 100) * (S / 2 - 60) + m.dx * 0.5,
+    S / 2 + (cfg.ovY / 100) * (S / 2 - 60) + m.dy * 0.5,
+    m.rot * 0.5,
+    m.scale
+  );
+
+  if (cfg.text) {
+    ctx.font = `bold 64px "Segoe UI", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = cfg.textColor;
+    ctx.strokeStyle = "rgba(0,0,0,0.45)";
+    ctx.lineWidth = 6;
+    ctx.strokeText(cfg.text, 256, 452);
+    ctx.fillText(cfg.text, 256, 452);
+  }
+}
 
 function Creator({ groups }) {
   const canvasRef = useRef(null);
   const all = useMemo(() => flatten(groups), [groups]);
   const [q, setQ] = useState("");
   const [target, setTarget] = useState("main");
+  const [recording, setRecording] = useState(false);
   const [cfg, setCfg] = useState({
     bgShape: "circle",
     color1: "#6d5cf5",
@@ -172,7 +254,8 @@ function Creator({ groups }) {
     ovX: 60,
     ovY: 60,
     text: "",
-    textColor: "#ffffff"
+    textColor: "#ffffff",
+    motion: "none"
   });
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
@@ -186,69 +269,114 @@ function Creator({ groups }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const S = 512;
     const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, S, S);
 
-    if (cfg.bgShape !== "none") {
-      let fill = cfg.color1;
-      if (cfg.useGrad) {
-        const g = ctx.createLinearGradient(0, 0, S, S);
-        g.addColorStop(0, cfg.color1);
-        g.addColorStop(1, cfg.color2);
-        fill = g;
-      }
-      ctx.fillStyle = fill;
-      ctx.beginPath();
-      if (cfg.bgShape === "circle") ctx.arc(S / 2, S / 2, S / 2 - 6, 0, Math.PI * 2);
-      else if (cfg.bgShape === "rounded") ctx.roundRect(6, 6, S - 12, S - 12, 110);
-      else ctx.rect(6, 6, S - 12, S - 12);
-      ctx.fill();
+    if (cfg.motion === "none") {
+      drawScene(ctx, cfg, 0);
+      return;
     }
 
-    const drawEmoji = (emoji, size, x, y, rot) => {
-      if (!emoji) return;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate((rot * Math.PI) / 180);
-      ctx.font = `${size}px ${EMOJI_FONT}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(emoji, 0, size * 0.06);
-      ctx.restore();
+    let raf;
+    const start = performance.now();
+    const loop = (now) => {
+      drawScene(ctx, cfg, (now - start) / 1000);
+      raf = requestAnimationFrame(loop);
     };
-
-    drawEmoji(cfg.main, cfg.mainSize, S / 2, S / 2 - (cfg.text ? 20 : 0), cfg.mainRot);
-    drawEmoji(cfg.overlay, cfg.ovSize, S / 2 + (cfg.ovX / 100) * (S / 2 - 60), S / 2 + (cfg.ovY / 100) * (S / 2 - 60), 0);
-
-    if (cfg.text) {
-      ctx.font = `bold 64px "Segoe UI", sans-serif`;
-      ctx.textAlign = "center";
-      ctx.fillStyle = cfg.textColor;
-      ctx.strokeStyle = "rgba(0,0,0,0.45)";
-      ctx.lineWidth = 6;
-      ctx.strokeText(cfg.text, 256, 452);
-      ctx.fillText(cfg.text, 256, 452);
-    }
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
   }, [cfg]);
 
-  const download = () => {
-    canvasRef.current.toBlob((blob) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "my-emoji.png";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+  const saveBlob = (blob, name) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const downloadPng = () => canvasRef.current.toBlob((b) => saveBlob(b, "my-emoji.png"));
+
+  const downloadJpg = () => {
+    const S = 512;
+    const tmp = document.createElement("canvas");
+    tmp.width = tmp.height = S;
+    const ctx = tmp.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, S, S);
+    ctx.drawImage(canvasRef.current, 0, 0);
+    tmp.toBlob((b) => saveBlob(b, "my-emoji.jpg"), "image/jpeg", 0.92);
+  };
+
+  const xmlSafe = (s) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const downloadSvg = () => {
+    const S = 512;
+    let bg = "";
+    const fillRef = cfg.useGrad ? "url(#g)" : cfg.color1;
+    if (cfg.bgShape === "circle") bg = `<circle cx="256" cy="256" r="250" fill="${fillRef}"/>`;
+    else if (cfg.bgShape === "rounded")
+      bg = `<rect x="6" y="6" width="500" height="500" rx="110" fill="${fillRef}"/>`;
+    else if (cfg.bgShape === "square")
+      bg = `<rect x="6" y="6" width="500" height="500" fill="${fillRef}"/>`;
+
+    const emojiEl = (emoji, size, x, y, rot) =>
+      emoji
+        ? `<text x="0" y="0" font-size="${size}" text-anchor="middle" dominant-baseline="central" font-family='${EMOJI_FONT.replace(/"/g, "")}' transform="translate(${x} ${y + size * 0.06}) rotate(${rot})">${xmlSafe(emoji)}</text>`
+        : "";
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${cfg.color1}"/><stop offset="1" stop-color="${cfg.color2}"/></linearGradient></defs>
+  ${bg}
+  ${emojiEl(cfg.main, cfg.mainSize, 256, 256 - (cfg.text ? 20 : 0), cfg.mainRot)}
+  ${emojiEl(cfg.overlay, cfg.ovSize, 256 + (cfg.ovX / 100) * 196, 256 + (cfg.ovY / 100) * 196, 0)}
+  ${cfg.text ? `<text x="256" y="452" font-size="64" font-weight="bold" text-anchor="middle" font-family="Segoe UI, sans-serif" fill="${cfg.textColor}" stroke="rgba(0,0,0,0.45)" stroke-width="6" paint-order="stroke">${xmlSafe(cfg.text)}</text>` : ""}
+</svg>`;
+    saveBlob(new Blob([svg], { type: "image/svg+xml" }), "my-emoji.svg");
+  };
+
+  const downloadWebm = () => {
+    if (recording) return;
+    const canvas = canvasRef.current;
+    if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
+      alert("Video export is not supported in this browser — try Chrome or Edge.");
+      return;
+    }
+    setRecording(true);
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.onstop = () => {
+      saveBlob(new Blob(chunks, { type: "video/webm" }), "my-emoji.webm");
+      setRecording(false);
+    };
+    rec.start();
+    setTimeout(() => rec.stop(), 3000);
   };
 
   return (
     <div className="creator-layout">
       <div className="creator-preview">
         <canvas ref={canvasRef} width={512} height={512} />
-        <button className="plan-cta" onClick={download}>
-          ⬇ Download PNG
-        </button>
+        <div className="dl-formats">
+          <button className="plan-cta" onClick={downloadPng}>PNG</button>
+          <button className="plan-cta" onClick={downloadJpg}>JPG</button>
+          <button className="plan-cta" onClick={downloadSvg}>SVG</button>
+          <button
+            className="plan-cta"
+            onClick={downloadWebm}
+            disabled={recording}
+            title="3-second video — for video editors use the green screen preset"
+          >
+            {recording ? <span className="spinner" /> : "🎬 Video"}
+          </button>
+        </div>
+        {cfg.motion === "none" && (
+          <p className="upload-note" style={{ maxWidth: "none" }}>
+            Tip: motion select karo toh Video export animated hoga
+          </p>
+        )}
       </div>
 
       <div className="creator-panel">
@@ -269,7 +397,29 @@ function Creator({ groups }) {
             <input type="checkbox" checked={cfg.useGrad} onChange={(e) => set("useGrad", e.target.checked)} />
             Gradient
           </label>
+          <span
+            className="chip"
+            title="Chroma-key background for video overlays"
+            onClick={() => setCfg((c) => ({ ...c, bgShape: "square", color1: "#00ff00", useGrad: false }))}
+          >
+            🎬 Green screen
+          </span>
         </span>
+
+        <label className="cp-label">
+          Motion
+          <span className="cp-row">
+            {MOTIONS.map((mo) => (
+              <span
+                key={mo}
+                className={`chip ${cfg.motion === mo ? "active" : ""}`}
+                onClick={() => set("motion", mo)}
+              >
+                {mo}
+              </span>
+            ))}
+          </span>
+        </label>
 
         <label className="cp-label">
           Main emoji size <input type="range" min="80" max="440" value={cfg.mainSize} onChange={(e) => set("mainSize", +e.target.value)} />
