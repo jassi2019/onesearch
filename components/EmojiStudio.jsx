@@ -6,9 +6,20 @@ const DATA_URL = "https://cdn.jsdelivr.net/npm/unicode-emoji-json@0.8.0/data-by-
 const EMOJI_FONT = '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
 
 const PRESETS = [
-  { label: "Like", main: "👍", text: "LIKE", motion: "pop", bgShape: "circle", color1: "#2563eb", color2: "#60a5fa", useGrad: true },
-  { label: "Subscribe", main: "🔔", text: "SUBSCRIBE", motion: "shake", bgShape: "rounded", color1: "#ff0000", color2: "#ff4d4d", useGrad: true },
-  { label: "Follow", main: "➕", text: "FOLLOW", motion: "pulse", bgShape: "circle", color1: "#7c5cff", color2: "#ff5e8e", useGrad: true },
+  // Creator buttons (YouTube / Instagram style)
+  { label: "Subscribe", layout: "button", main: "", text: "SUBSCRIBE", motion: "pop", bgShape: "none", color1: "#ff0000", color2: "#ff0000", useGrad: false },
+  { label: "Bell Ring", main: "🔔", text: "", motion: "shake", bgShape: "none" },
+  { label: "Turn On Bell", layout: "button", main: "🔔", text: "TURN ON", motion: "shake", bgShape: "none", color1: "#ff0000", color2: "#ff4d4d", useGrad: true },
+  { label: "Like Button", layout: "button", main: "👍", text: "LIKE", motion: "pop", bgShape: "none", color1: "#1d72f3", color2: "#49a0ff", useGrad: true },
+  { label: "Share", layout: "button", main: "📤", text: "SHARE", motion: "slide", bgShape: "none", color1: "#16a34a", color2: "#4ade80", useGrad: true },
+  { label: "Comment", layout: "button", main: "💬", text: "COMMENT", motion: "wobble", bgShape: "none", color1: "#334155", color2: "#64748b", useGrad: true },
+  { label: "Follow (IG)", layout: "button", main: "", text: "FOLLOW", motion: "pulse", bgShape: "none", color1: "#7c5cff", color2: "#ff5e8e", useGrad: true },
+  { label: "Live", layout: "button", main: "🔴", text: "LIVE", motion: "blink", bgShape: "none", color1: "#dc2626", color2: "#dc2626", useGrad: false },
+  { label: "New Video", layout: "button", main: "▶️", text: "NEW VIDEO", motion: "zoom", bgShape: "none", color1: "#ff0000", color2: "#ff6b6b", useGrad: true },
+  { label: "Link In Bio", layout: "button", main: "🔗", text: "LINK IN BIO", motion: "bounce", bgShape: "none", color1: "#7c5cff", color2: "#ff5e8e", useGrad: true },
+  { label: "Swipe Up", layout: "button", main: "⬆️", text: "SWIPE UP", motion: "float", bgShape: "none", color1: "#0ea5e9", color2: "#38bdf8", useGrad: true },
+  { label: "Tap Here", layout: "button", main: "👆", text: "TAP HERE", motion: "heartbeat", bgShape: "none", color1: "#f59e0b", color2: "#fbbf24", useGrad: true },
+  // Emoji reactions
   { label: "Love", main: "❤️", text: "", motion: "heartbeat", bgShape: "none" },
   { label: "Fire", main: "🔥", text: "", motion: "pulse", bgShape: "none" },
   { label: "100", main: "💯", text: "", motion: "bounce", bgShape: "none" },
@@ -93,8 +104,21 @@ function Trending({ onUse }) {
       <div className="preset-grid">
         {PRESETS.map((p) => (
           <button key={p.label} className="preset-card" onClick={() => onUse(p)}>
-            <span className={`preset-emoji anim-${p.motion}`}>{p.main}</span>
-            <span className="preset-label">{p.text || p.label}</span>
+            {p.layout === "button" ? (
+              <span
+                className={`preset-btnpill anim-${p.motion}`}
+                style={{
+                  background: p.useGrad
+                    ? `linear-gradient(90deg, ${p.color1}, ${p.color2})`
+                    : p.color1
+                }}
+              >
+                {p.main} {p.text}
+              </span>
+            ) : (
+              <span className={`preset-emoji anim-${p.motion}`}>{p.main}</span>
+            )}
+            <span className="preset-label">{p.label}</span>
             <span className="preset-motion">{p.motion}</span>
           </button>
         ))}
@@ -327,6 +351,69 @@ function drawScene(ctx, cfg, t) {
   const sx = m.scaleX ?? m.scale;
   const sy = m.scaleY ?? m.scale;
 
+  if (cfg.layout === "button") {
+    const label = (cfg.text || "SUBSCRIBE").toUpperCase();
+    const icon = cfg.main || "";
+    ctx.font = `800 56px "Arial", "Segoe UI", sans-serif`;
+    const textW = ctx.measureText(label).width;
+    const iconW = icon ? 78 : 0;
+    const padX = 54;
+    const w = Math.min(470, padX * 2 + iconW + textW);
+    const h = 140;
+
+    ctx.save();
+    ctx.globalAlpha = m.alpha;
+    ctx.translate(S / 2 + m.dx, S / 2 + m.dy);
+    ctx.rotate(((cfg.mainRot + m.rot) * Math.PI) / 180);
+    ctx.scale(sx, sy);
+
+    let fill = cfg.color1;
+    if (cfg.useGrad) {
+      const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+      g.addColorStop(0, cfg.color1);
+      g.addColorStop(1, cfg.color2);
+      fill = g;
+    }
+    ctx.shadowColor = "rgba(0,0,0,0.4)";
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 12;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.roundRect(-w / 2, -h / 2, w, h, h / 2);
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+
+    let tx = -w / 2 + padX + iconW;
+    if (icon) {
+      ctx.font = `64px ${EMOJI_FONT}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(icon, -w / 2 + padX + 26, 4);
+    }
+    ctx.font = `800 56px "Arial", "Segoe UI", sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = cfg.textColor || "#ffffff";
+    ctx.fillText(label, tx, 4);
+    ctx.restore();
+
+    const mo = motionTransform(cfg.motion, t * (cfg.speed || 1));
+    if (cfg.overlay) {
+      ctx.save();
+      ctx.globalAlpha = mo.alpha;
+      ctx.translate(
+        S / 2 + (cfg.ovX / 100) * (S / 2 - 60) + mo.dx * 0.5,
+        S / 2 + (cfg.ovY / 100) * (S / 2 - 60) + mo.dy * 0.5
+      );
+      ctx.font = `${cfg.ovSize}px ${EMOJI_FONT}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(cfg.overlay, 0, cfg.ovSize * 0.06);
+      ctx.restore();
+    }
+    return;
+  }
+
   const drawEmoji = (emoji, size, x, y, rot, scX = 1, scY = 1, alpha = 1) => {
     if (!emoji) return;
     ctx.save();
@@ -394,14 +481,15 @@ function Creator({ groups, preset, presetKey }) {
     text: "",
     textColor: "#ffffff",
     motion: "none",
-    speed: 1
+    speed: 1,
+    layout: "emoji"
   });
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
 
   useEffect(() => {
     if (!preset) return;
-    setCfg((c) => ({ ...c, overlay: "", useGrad: false, text: "", ...preset }));
+    setCfg((c) => ({ ...c, overlay: "", useGrad: false, text: "", layout: "emoji", ...preset }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presetKey]);
 
@@ -457,6 +545,18 @@ function Creator({ groups, preset, presetKey }) {
 
   const downloadSvg = () => {
     const S = 512;
+    if (cfg.layout === "button") {
+      const label = (cfg.text || "SUBSCRIBE").toUpperCase();
+      const w = Math.min(470, 108 + (cfg.main ? 78 : 0) + label.length * 34);
+      const fillRef = cfg.useGrad ? "url(#g)" : cfg.color1;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${cfg.color1}"/><stop offset="1" stop-color="${cfg.color2}"/></linearGradient></defs>
+  <rect x="${256 - w / 2}" y="186" width="${w}" height="140" rx="70" fill="${fillRef}"/>
+  <text x="256" y="262" font-size="56" font-weight="800" text-anchor="middle" font-family="Arial, sans-serif" fill="${cfg.textColor}">${cfg.main ? xmlSafe(cfg.main) + " " : ""}${xmlSafe(label)}</text>
+</svg>`;
+      saveBlob(new Blob([svg], { type: "image/svg+xml" }), "my-button.svg");
+      return;
+    }
     let bg = "";
     const fillRef = cfg.useGrad ? "url(#g)" : cfg.color1;
     if (cfg.bgShape === "circle") bg = `<circle cx="256" cy="256" r="250" fill="${fillRef}"/>`;
@@ -606,6 +706,18 @@ function Creator({ groups, preset, presetKey }) {
 
       <div className="creator-panel">
         <label className="cp-label">
+          Style
+          <span className="cp-row">
+            <span className={`chip ${cfg.layout !== "button" ? "active" : ""}`} onClick={() => set("layout", "emoji")}>
+              😀 Emoji
+            </span>
+            <span className={`chip ${cfg.layout === "button" ? "active" : ""}`} onClick={() => set("layout", "button")}>
+              🔘 Button (Subscribe/Like…)
+            </span>
+          </span>
+        </label>
+
+        <label className="cp-label">
           Background
           <span className="cp-row">
             {BG_SHAPES.map((s) => (
@@ -684,12 +796,12 @@ function Creator({ groups, preset, presetKey }) {
         )}
 
         <label className="cp-label">
-          Text
+          {cfg.layout === "button" ? "Button text (color pickers upar wale button ke hain)" : "Text"}
           <span className="cp-row">
             <input
               className="emoji-search"
-              maxLength={12}
-              placeholder="Optional text…"
+              maxLength={cfg.layout === "button" ? 14 : 12}
+              placeholder={cfg.layout === "button" ? "SUBSCRIBE" : "Optional text…"}
               value={cfg.text}
               onChange={(e) => set("text", e.target.value)}
             />
