@@ -969,6 +969,105 @@ img {
   margin-top: 4px;
 }
 
+/* Trending presets */
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+}
+
+.preset-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 20px 10px 14px;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.preset-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+}
+
+.preset-emoji {
+  display: inline-block;
+  font-size: 46px;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.preset-label {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.preset-motion {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Live motion previews */
+.anim-bounce { animation: pv-bounce 0.9s ease-in-out infinite; }
+.anim-spin { animation: pv-spin 2s linear infinite; }
+.anim-pulse { animation: pv-pulse 1s ease-in-out infinite; }
+.anim-shake { animation: pv-shake 0.4s linear infinite; }
+.anim-wave { animation: pv-wave 2s ease-in-out infinite; }
+.anim-heartbeat { animation: pv-heartbeat 1s ease-in-out infinite; }
+.anim-pop { animation: pv-pop 1.3s cubic-bezier(0.2, 0.7, 0.3, 1.4) infinite; }
+.anim-swing { animation: pv-swing 1.6s ease-in-out infinite; }
+
+@keyframes pv-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pv-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pv-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+@keyframes pv-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-4px) rotate(-5deg); }
+  75% { transform: translateX(4px) rotate(5deg); }
+}
+
+@keyframes pv-wave {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-7px) rotate(10deg); }
+}
+
+@keyframes pv-heartbeat {
+  0%, 40%, 100% { transform: scale(1); }
+  15% { transform: scale(1.22); }
+  30% { transform: scale(1.1); }
+}
+
+@keyframes pv-pop {
+  0% { transform: scale(0.55); }
+  35% { transform: scale(1.15); }
+  50%, 100% { transform: scale(1); }
+}
+
+@keyframes pv-swing {
+  0%, 100% { transform: rotate(-14deg) translateX(-6px); }
+  50% { transform: rotate(14deg) translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset-emoji { animation: none !important; }
+}
+
 /* Favourite buttons */
 .act.fav.active {
   background: #ffe3e8;

@@ -5,10 +5,41 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const DATA_URL = "https://cdn.jsdelivr.net/npm/unicode-emoji-json@0.8.0/data-by-group.json";
 const EMOJI_FONT = '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
 
+const PRESETS = [
+  { label: "Like", main: "👍", text: "LIKE", motion: "pop", bgShape: "circle", color1: "#2563eb", color2: "#60a5fa", useGrad: true },
+  { label: "Subscribe", main: "🔔", text: "SUBSCRIBE", motion: "shake", bgShape: "rounded", color1: "#ff0000", color2: "#ff4d4d", useGrad: true },
+  { label: "Follow", main: "➕", text: "FOLLOW", motion: "pulse", bgShape: "circle", color1: "#7c5cff", color2: "#ff5e8e", useGrad: true },
+  { label: "Love", main: "❤️", text: "", motion: "heartbeat", bgShape: "none" },
+  { label: "Fire", main: "🔥", text: "", motion: "pulse", bgShape: "none" },
+  { label: "100", main: "💯", text: "", motion: "bounce", bgShape: "none" },
+  { label: "LOL", main: "😂", text: "", motion: "bounce", bgShape: "none" },
+  { label: "Clap", main: "👏", text: "", motion: "shake", bgShape: "none" },
+  { label: "Party", main: "🎉", text: "", motion: "pop", bgShape: "none" },
+  { label: "Point Down", main: "👇", text: "", motion: "bounce", bgShape: "none" },
+  { label: "Point Up", main: "☝️", text: "", motion: "bounce", bgShape: "none" },
+  { label: "New", main: "✨", text: "NEW", motion: "spin", bgShape: "circle", color1: "#f59e0b", color2: "#fbbf24", useGrad: true },
+  { label: "Sale", main: "💰", text: "SALE", motion: "heartbeat", bgShape: "rounded", color1: "#16a34a", color2: "#4ade80", useGrad: true },
+  { label: "Rocket", main: "🚀", text: "", motion: "swing", bgShape: "none" },
+  { label: "Mind Blown", main: "🤯", text: "", motion: "shake", bgShape: "none" },
+  { label: "Heart Eyes", main: "😍", text: "", motion: "heartbeat", bgShape: "none" },
+  { label: "Eyes", main: "👀", text: "", motion: "wave", bgShape: "none" },
+  { label: "Warning", main: "⚠️", text: "", motion: "pulse", bgShape: "none" },
+  { label: "Check", main: "✅", text: "", motion: "pop", bgShape: "none" },
+  { label: "Crown", main: "👑", text: "", motion: "swing", bgShape: "none" }
+];
+
 export default function EmojiStudio() {
   const [tab, setTab] = useState("library");
   const [groups, setGroups] = useState(null);
   const [error, setError] = useState("");
+  const [preset, setPreset] = useState(null);
+  const [presetKey, setPresetKey] = useState(0);
+
+  const usePreset = (p) => {
+    setPreset(p);
+    setPresetKey((k) => k + 1);
+    setTab("create");
+  };
 
   useEffect(() => {
     fetch(DATA_URL)
@@ -27,6 +58,9 @@ export default function EmojiStudio() {
         <button className={`chip ${tab === "library" ? "active" : ""}`} onClick={() => setTab("library")}>
           😀 Emoji Library
         </button>
+        <button className={`chip ${tab === "trending" ? "active" : ""}`} onClick={() => setTab("trending")}>
+          🔥 Trending
+        </button>
         <button className={`chip ${tab === "create" ? "active" : ""}`} onClick={() => setTab("create")}>
           🎨 Create Your Own
         </button>
@@ -41,8 +75,31 @@ export default function EmojiStudio() {
       )}
 
       {groups && tab === "library" && <Library groups={groups} />}
-      {groups && tab === "create" && <Creator groups={groups} />}
+      {tab === "trending" && <Trending onUse={usePreset} />}
+      {groups && tab === "create" && (
+        <Creator groups={groups} preset={preset} presetKey={presetKey} />
+      )}
     </div>
+  );
+}
+
+function Trending({ onUse }) {
+  return (
+    <>
+      <p className="status">
+        Ready-made animated elements for YouTube videos, Shorts &amp; Reels — click to customise,
+        then export as GIF or 🎬 green-screen Video for your editor
+      </p>
+      <div className="preset-grid">
+        {PRESETS.map((p) => (
+          <button key={p.label} className="preset-card" onClick={() => onUse(p)}>
+            <span className={`preset-emoji anim-${p.motion}`}>{p.main}</span>
+            <span className="preset-label">{p.text || p.label}</span>
+            <span className="preset-motion">{p.motion}</span>
+          </button>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -153,10 +210,22 @@ function Library({ groups }) {
 }
 
 const BG_SHAPES = ["circle", "rounded", "square", "none"];
-const MOTIONS = ["none", "bounce", "spin", "pulse", "shake", "wave"];
+const MOTIONS = ["none", "bounce", "spin", "pulse", "shake", "wave", "heartbeat", "pop", "swing"];
 
 function motionTransform(motion, t) {
   switch (motion) {
+    case "heartbeat": {
+      const p = (t % 1) * Math.PI * 2;
+      const beat = Math.max(0, Math.sin(p)) ** 3 + 0.7 * Math.max(0, Math.sin(p + 2.1)) ** 8;
+      return { dx: 0, dy: 0, rot: 0, scale: 1 + 0.2 * beat };
+    }
+    case "pop": {
+      const p = (t % 1.3) / 1.3;
+      const s = p < 0.35 ? 0.55 + 0.45 * Math.sin((p / 0.35) * Math.PI * 0.5) * 1.35 : 1;
+      return { dx: 0, dy: 0, rot: 0, scale: Math.min(s, 1.18) };
+    }
+    case "swing":
+      return { dx: Math.sin(t * Math.PI * 1.25) * 14, dy: 0, rot: Math.sin(t * Math.PI * 1.25) * 20, scale: 1 };
     case "bounce":
       return { dx: 0, dy: -Math.abs(Math.sin(t * Math.PI / 0.6)) * 34, rot: 0, scale: 1 };
     case "spin":
@@ -235,7 +304,7 @@ function drawScene(ctx, cfg, t) {
   }
 }
 
-function Creator({ groups }) {
+function Creator({ groups, preset, presetKey }) {
   const canvasRef = useRef(null);
   const all = useMemo(() => flatten(groups), [groups]);
   const [q, setQ] = useState("");
@@ -259,6 +328,12 @@ function Creator({ groups }) {
   });
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
+
+  useEffect(() => {
+    if (!preset) return;
+    setCfg((c) => ({ ...c, overlay: "", useGrad: false, text: "", ...preset }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presetKey]);
 
   const picks = useMemo(() => {
     const query = q.trim().toLowerCase();
