@@ -2,7 +2,7 @@ import { Outfit, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const GA_ID = "G-2EHYDC2XZV";
+const GA_ID = "G-88S0167W4K";
 const GTM_ID = "GTM-KPR5NWZN";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-head", weight: ["500", "600", "700", "800"] });
