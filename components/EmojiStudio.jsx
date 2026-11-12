@@ -2,8 +2,80 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const DATA_URL = "https://cdn.jsdelivr.net/npm/unicode-emoji-json@0.8.0/data-by-group.json";
+export const DATA_URL = "https://cdn.jsdelivr.net/npm/unicode-emoji-json@0.8.0/data-by-group.json";
 const EMOJI_FONT = '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+
+const APPLE_CDN = "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/";
+
+export function appleUrl(emoji) {
+  const unified = [...emoji]
+    .map((c) => c.codePointAt(0).toString(16).padStart(4, "0"))
+    .join("-");
+  return `${APPLE_CDN}${unified}.png`;
+}
+
+let emojiListPromise;
+export function loadEmojiList() {
+  emojiListPromise ||= fetch(DATA_URL)
+    .then((r) => r.json())
+    .then((raw) => {
+      const groups = Array.isArray(raw)
+        ? raw
+        : Object.entries(raw).map(([name, emojis]) => ({ name, emojis }));
+      const out = [];
+      for (const g of groups) for (const e of g.emojis) out.push({ emoji: e.emoji, name: e.name });
+      return out;
+    });
+  return emojiListPromise;
+}
+
+const appleCache = new Map();
+function getAppleImg(emoji, onReady) {
+  let rec = appleCache.get(emoji);
+  if (!rec) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    rec = { img, status: "loading", retried: false };
+    img.onload = () => {
+      rec.status = "ok";
+      onReady && onReady();
+    };
+    img.onerror = () => {
+      if (!rec.retried && emoji.includes("️")) {
+        rec.retried = true;
+        img.src = appleUrl(emoji.replace(/️/g, ""));
+      } else {
+        rec.status = "fail";
+        onReady && onReady();
+      }
+    };
+    img.src = appleUrl(emoji);
+    appleCache.set(emoji, rec);
+  }
+  return rec;
+}
+
+function AppleEmoji({ e, size = 30 }) {
+  const [fail, setFail] = useState(false);
+  if (fail) return e;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={appleUrl(e)}
+      alt={e}
+      width={size}
+      height={size}
+      loading="lazy"
+      draggable={false}
+      onError={(ev) => {
+        if (ev.currentTarget.dataset.r !== "1" && e.includes("️")) {
+          ev.currentTarget.dataset.r = "1";
+          ev.currentTarget.src = appleUrl(e.replace(/️/g, ""));
+        } else setFail(true);
+      }}
+    />
+  );
+}
 
 const PRESETS = [
   // Creator buttons (YouTube / Instagram style)
@@ -140,6 +212,7 @@ function Library({ groups }) {
   const [q, setQ] = useState("");
   const [copied, setCopied] = useState("");
   const [limit, setLimit] = useState(300);
+  const [style, setStyle] = useState("apple");
 
   const all = useMemo(() => flatten(groups), [groups]);
   const cats = ["All", ...Object.keys(groups)];
@@ -159,7 +232,22 @@ function Library({ groups }) {
     } catch {}
   };
 
-  const downloadPng = (e) => {
+  const downloadPng = async (e) => {
+    const save = (blob) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${e.slug || "emoji"}.png`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    if (style === "apple") {
+      try {
+        let res = await fetch(appleUrl(e.emoji));
+        if (!res.ok && e.emoji.includes("️"))
+          res = await fetch(appleUrl(e.emoji.replace(/️/g, "")));
+        if (res.ok) return save(await res.blob());
+      } catch {}
+    }
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 256;
     const ctx = canvas.getContext("2d");
@@ -167,13 +255,7 @@ function Library({ groups }) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(e.emoji, 128, 140);
-    canvas.toBlob((blob) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${e.slug || "emoji"}.png`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+    canvas.toBlob(save);
   };
 
   return (
@@ -190,6 +272,13 @@ function Library({ groups }) {
         />
       </div>
       <div className="suggestions emoji-cats">
+        <span className={`chip ${style === "apple" ? "active" : ""}`} onClick={() => setStyle("apple")}>
+          🍎 Apple
+        </span>
+        <span className={`chip ${style === "native" ? "active" : ""}`} onClick={() => setStyle("native")}>
+          💻 Native
+        </span>
+        <span style={{ opacity: 0.4 }}>|</span>
         {cats.map((c) => (
           <span
             key={c}
@@ -218,7 +307,7 @@ function Library({ groups }) {
               downloadPng(e);
             }}
           >
-            {copied === e.emoji ? "✓" : e.emoji}
+            {copied === e.emoji ? "✓" : style === "apple" ? <AppleEmoji e={e.emoji} /> : e.emoji}
           </button>
         ))}
       </div>
@@ -327,7 +416,7 @@ function motionTransform(motion, t) {
   }
 }
 
-function drawScene(ctx, cfg, t) {
+function drawScene(ctx, cfg, t, onImg) {
   const S = 512;
   ctx.clearRect(0, 0, S, S);
 
@@ -421,6 +510,14 @@ function drawScene(ctx, cfg, t) {
     ctx.translate(x, y);
     ctx.rotate((rot * Math.PI) / 180);
     ctx.scale(scX, scY);
+    if (cfg.appleStyle) {
+      const rec = getAppleImg(emoji, onImg);
+      if (rec.status === "ok") {
+        ctx.drawImage(rec.img, -size / 2, -size / 2, size, size);
+        ctx.restore();
+        return;
+      }
+    }
     ctx.font = `${size}px ${EMOJI_FONT}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -482,8 +579,10 @@ function Creator({ groups, preset, presetKey }) {
     textColor: "#ffffff",
     motion: "none",
     speed: 1,
-    layout: "emoji"
+    layout: "emoji",
+    appleStyle: true
   });
+  const [imgTick, setImgTick] = useState(0);
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
 
@@ -503,21 +602,29 @@ function Creator({ groups, preset, presetKey }) {
     const canvas = canvasRef.current;
     if (!canvas || recording) return;
     const ctx = canvas.getContext("2d");
+    const onImg = () => setImgTick((v) => v + 1);
 
     if (cfg.motion === "none") {
-      drawScene(ctx, cfg, 0);
+      drawScene(ctx, cfg, 0, onImg);
       return;
     }
 
     let raf;
     const start = performance.now();
     const loop = (now) => {
-      drawScene(ctx, cfg, (now - start) / 1000);
+      drawScene(ctx, cfg, (now - start) / 1000, onImg);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [cfg, recording]);
+  }, [cfg, recording, imgTick]);
+
+  const preloadApple = (emoji) =>
+    new Promise((resolve) => {
+      if (!cfg.appleStyle || !emoji) return resolve();
+      const rec = getAppleImg(emoji, resolve);
+      if (rec.status !== "loading") resolve();
+    });
 
   const saveBlob = (blob, name) => {
     const a = document.createElement("a");
@@ -588,7 +695,7 @@ function Creator({ groups, preset, presetKey }) {
     return true;
   };
 
-  const downloadWebm = () => {
+  const downloadWebm = async () => {
     if (recording || !ensureMotion()) return;
     const canvas = canvasRef.current;
     if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
@@ -596,6 +703,8 @@ function Creator({ groups, preset, presetKey }) {
       return;
     }
     setRecording(true);
+    await preloadApple(cfg.main);
+    await preloadApple(cfg.overlay);
     const ctx = canvas.getContext("2d");
 
     let stream = canvas.captureStream(0);
@@ -634,6 +743,8 @@ function Creator({ groups, preset, presetKey }) {
   const downloadGif = async () => {
     if (recording || !ensureMotion()) return;
     setRecording(true);
+    await preloadApple(cfg.main);
+    await preloadApple(cfg.overlay);
     try {
       if (!window.GIF) {
         const base = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/";
@@ -714,6 +825,14 @@ function Creator({ groups, preset, presetKey }) {
             <span className={`chip ${cfg.layout === "button" ? "active" : ""}`} onClick={() => set("layout", "button")}>
               🔘 Button (Subscribe/Like…)
             </span>
+            <label className="cp-check">
+              <input
+                type="checkbox"
+                checked={cfg.appleStyle}
+                onChange={(e) => set("appleStyle", e.target.checked)}
+              />
+              🍎 Apple look
+            </label>
           </span>
         </label>
 
@@ -828,7 +947,7 @@ function Creator({ groups, preset, presetKey }) {
               title={e.name}
               onClick={() => set(target === "main" ? "main" : "overlay", e.emoji)}
             >
-              {e.emoji}
+              {cfg.appleStyle ? <AppleEmoji e={e.emoji} size={24} /> : e.emoji}
             </button>
           ))}
         </div>

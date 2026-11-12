@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import ImageGrid from "./ImageGrid";
+import { loadEmojiList, appleUrl } from "./EmojiStudio";
 
 const SOURCES = ["openverse", "unsplash", "pexels", "pixabay", "pinterest"];
 const TRENDING = ["nature", "business", "food", "travel", "technology", "fashion", "abstract"];
@@ -48,6 +49,8 @@ export default function SearchApp() {
   const [listening, setListening] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [blockedMsg, setBlockedMsg] = useState("");
+  const [emojiMatches, setEmojiMatches] = useState([]);
+  const [copiedEmoji, setCopiedEmoji] = useState("");
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -104,6 +107,21 @@ export default function SearchApp() {
             .then((r) => r.json())
             .then((d) => setSuggestions(d.suggestions || []))
             .catch(() => setSuggestions([]));
+
+          loadEmojiList()
+            .then((list) => {
+              const ql = q.toLowerCase();
+              const tokens = ql.split(/\s+/).filter((w) => w.length > 2);
+              const scored = [];
+              for (const e of list) {
+                const n = e.name.toLowerCase();
+                if (n === ql || n.includes(ql)) scored.push([0, e]);
+                else if (tokens.some((w) => n.includes(w))) scored.push([1, e]);
+              }
+              scored.sort((a, b) => a[0] - b[0]);
+              setEmojiMatches(scored.slice(0, 14).map(([, e]) => e));
+            })
+            .catch(() => setEmojiMatches([]));
         }
       } catch (err) {
         console.error(err);
@@ -262,6 +280,43 @@ export default function SearchApp() {
               {t}
             </span>
           ))}
+        </div>
+      )}
+
+      {searched && emojiMatches.length > 0 && (
+        <div className="suggestions">
+          <span>Emojis:</span>
+          {emojiMatches.map((m) => (
+            <button
+              key={m.emoji}
+              className="emoji-chip"
+              title={`${m.name} — click to copy`}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(m.emoji);
+                  setCopiedEmoji(m.emoji);
+                  setTimeout(() => setCopiedEmoji(""), 1200);
+                } catch {}
+              }}
+            >
+              {copiedEmoji === m.emoji ? (
+                "✓"
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={appleUrl(m.emoji)}
+                  alt={m.emoji}
+                  width={26}
+                  height={26}
+                  draggable={false}
+                  onError={(ev) => ev.currentTarget.replaceWith(document.createTextNode(m.emoji))}
+                />
+              )}
+            </button>
+          ))}
+          <a className="chip" href="/emoji" title="Open Emoji Studio">
+            More →
+          </a>
         </div>
       )}
 
