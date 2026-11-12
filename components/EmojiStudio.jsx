@@ -268,7 +268,7 @@ function Creator({ groups }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || recording) return;
     const ctx = canvas.getContext("2d");
 
     if (cfg.motion === "none") {
@@ -284,7 +284,7 @@ function Creator({ groups }) {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [cfg]);
+  }, [cfg, recording]);
 
   const saveBlob = (blob, name) => {
     const a = document.createElement("a");
@@ -335,15 +335,32 @@ function Creator({ groups }) {
     saveBlob(new Blob([svg], { type: "image/svg+xml" }), "my-emoji.svg");
   };
 
+  const ensureMotion = () => {
+    if (cfg.motion === "none") {
+      alert("Pehle koi motion select karo (bounce / spin / pulse / shake / wave)");
+      return false;
+    }
+    return true;
+  };
+
   const downloadWebm = () => {
-    if (recording) return;
+    if (recording || !ensureMotion()) return;
     const canvas = canvasRef.current;
     if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
       alert("Video export is not supported in this browser — try Chrome or Edge.");
       return;
     }
     setRecording(true);
-    const stream = canvas.captureStream(30);
+    const ctx = canvas.getContext("2d");
+
+    let stream = canvas.captureStream(0);
+    let track = stream.getVideoTracks()[0];
+    const manual = typeof track.requestFrame === "function";
+    if (!manual) {
+      stream = canvas.captureStream(30);
+      track = stream.getVideoTracks()[0];
+    }
+
     const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
     const chunks = [];
     rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
@@ -352,7 +369,67 @@ function Creator({ groups }) {
       setRecording(false);
     };
     rec.start();
-    setTimeout(() => rec.stop(), 3000);
+
+    const fps = 30;
+    const totalFrames = fps * 3;
+    let frame = 0;
+    const step = () => {
+      drawScene(ctx, cfg, frame / fps);
+      if (manual) track.requestFrame();
+      frame++;
+      if (frame > totalFrames) {
+        rec.stop();
+        return;
+      }
+      setTimeout(step, 1000 / fps);
+    };
+    step();
+  };
+
+  const downloadGif = async () => {
+    if (recording || !ensureMotion()) return;
+    setRecording(true);
+    try {
+      if (!window.GIF) {
+        const base = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/";
+        const workerSrc = await (await fetch(`${base}gif.worker.js`)).text();
+        window.__gifWorkerUrl = URL.createObjectURL(
+          new Blob([workerSrc], { type: "application/javascript" })
+        );
+        await new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = `${base}gif.js`;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      const gif = new window.GIF({
+        workers: 2,
+        quality: 10,
+        width: 512,
+        height: 512,
+        workerScript: window.__gifWorkerUrl
+      });
+      const fps = 15;
+      const frames = fps * 3;
+      for (let f = 0; f < frames; f++) {
+        drawScene(ctx, cfg, f / fps);
+        gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
+      }
+      await new Promise((resolve) => {
+        gif.on("finished", (blob) => {
+          saveBlob(blob, "my-emoji.gif");
+          resolve();
+        });
+        gif.render();
+      });
+    } catch {
+      alert("GIF export failed — try again");
+    }
+    setRecording(false);
   };
 
   return (
@@ -363,6 +440,9 @@ function Creator({ groups }) {
           <button className="plan-cta" onClick={downloadPng}>PNG</button>
           <button className="plan-cta" onClick={downloadJpg}>JPG</button>
           <button className="plan-cta" onClick={downloadSvg}>SVG</button>
+          <button className="plan-cta" onClick={downloadGif} disabled={recording} title="3-second animated GIF">
+            {recording ? <span className="spinner" /> : "GIF"}
+          </button>
           <button
             className="plan-cta"
             onClick={downloadWebm}
