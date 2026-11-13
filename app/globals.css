@@ -2654,3 +2654,27 @@ footer a:hover {
     padding: 20px 16px;
   }
 }
+
+/* ===== Contact link in header: text on desktop, envelope icon on mobile ===== */
+.nav-contact {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nc-icon {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .nc-text {
+    display: none;
+  }
+
+  .nc-icon {
+    display: block;
+  }
+
+  .nav-contact {
+    padding: 6px 5px;
+  }
+}

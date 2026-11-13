@@ -59,6 +59,24 @@ export default function TopNav() {
         <a href="/creators">Creators</a>
         <a href="/collections">Collections</a>
         <a href="/pricing">Pricing</a>
+        <a href="/contact" className="nav-contact" title="Contact us">
+          <span className="nc-text">Contact</span>
+          <svg
+            className="nc-icon"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="3" />
+            <path d="m2 7 10 7 10-7" />
+          </svg>
+        </a>
         {user && (
           <span className="bell-wrap">
             <button className="bell" onClick={togglePanel} aria-label="Notifications">
