@@ -10,8 +10,37 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-head", weight: ["5
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata = {
-  title: "OneSearch — Image Search Aggregator",
-  description: "Search millions of free, high-quality images from one place.",
+  metadataBase: new URL("https://onesearch-lm.vercel.app"),
+  title: "OneSearch — Free Stock Image Search Engine",
+  description:
+    "Search millions of free stock photos, illustrations and vectors from five image libraries at once. HD downloads, voice search, emoji studio and creator pages — free.",
+  keywords: [
+    "free stock images",
+    "free stock photos",
+    "image search engine",
+    "stock photo search",
+    "royalty free images",
+    "free images for commercial use",
+    "hd image download",
+    "emoji maker"
+  ],
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "OneSearch",
+    url: "https://onesearch-lm.vercel.app",
+    title: "OneSearch — Free Stock Image Search Engine",
+    description:
+      "Millions of free stock photos from five image libraries in one search. HD downloads, voice search and an emoji studio — free.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "OneSearch — free stock image search" }]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OneSearch — Free Stock Image Search Engine",
+    description:
+      "Millions of free stock photos from five image libraries in one search. HD downloads, voice search and an emoji studio — free.",
+    images: ["/og.png"]
+  },
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
