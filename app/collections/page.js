@@ -20,7 +20,8 @@ export default function CollectionsPage() {
         <CollectionsView />
       </div>
       <footer>
-        <a href="/">← Back to search</a> · <a href="/privacy">Privacy Policy</a>
+        <a href="/">← Back to search</a> · <a href="/privacy">Privacy Policy</a> ·{" "}
+        <a href="/contact">Contact</a>
       </footer>
     </main>
   );

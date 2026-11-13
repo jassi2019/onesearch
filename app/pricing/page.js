@@ -23,7 +23,8 @@ export default function PricingPage() {
         </p>
       </div>
       <footer>
-        <a href="/">← Back to search</a> · <a href="/privacy">Privacy Policy</a>
+        <a href="/">← Back to search</a> · <a href="/privacy">Privacy Policy</a> ·{" "}
+        <a href="/contact">Contact</a>
       </footer>
     </main>
   );

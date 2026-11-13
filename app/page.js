@@ -16,7 +16,8 @@ export default function Home() {
       </div>
       <footer>
         Images belong to their respective photographers and platforms. OneSearch is an aggregator —
-        always follow each platform&apos;s license. · <a href="/privacy">Privacy Policy</a>
+        always follow each platform&apos;s license. · <a href="/privacy">Privacy Policy</a> ·{" "}
+        <a href="/contact">Contact</a>
       </footer>
     </main>
   );
