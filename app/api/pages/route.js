@@ -8,6 +8,7 @@ export async function GET() {
   if (!token || !verifyToken(token)) {
     return NextResponse.json({ error: "Not logged in" }, { status: 401 });
   }
-  const pages = await getPageIndex();
+  // Only Business (creator) accounts are listed publicly — personal profiles stay private.
+  const pages = (await getPageIndex()).filter((p) => p.accountType === "business");
   return NextResponse.json({ pages });
 }

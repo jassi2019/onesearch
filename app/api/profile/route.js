@@ -78,6 +78,16 @@ export async function PUT(request) {
     if (!ACCOUNT_TYPES.includes(body.accountType)) {
       return NextResponse.json({ error: "Invalid account type" }, { status: 400 });
     }
+    const current = user.accountType || "personal";
+    if (body.accountType === "business" && current !== "business") {
+      if (body.creatorConsent !== true) {
+        return NextResponse.json(
+          { error: "Please accept the Creator Terms to switch to a Business account" },
+          { status: 400 }
+        );
+      }
+      user.creatorConsentAt = new Date().toISOString();
+    }
     user.accountType = body.accountType;
   }
 

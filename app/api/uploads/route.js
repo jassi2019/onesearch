@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 import * as _opentype from "opentype.js";
 
 const opentype = _opentype.default || _opentype;
-import { verifyToken, SESSION_COOKIE } from "../../../lib/auth";
+import { verifyToken, SESSION_COOKIE, getUser } from "../../../lib/auth";
 import { getPage, savePage, pageIdFor } from "../../../lib/pages";
 import { addNotification } from "../../../lib/notifications";
 
@@ -121,6 +121,17 @@ function watermarkSvg(width, height, text) {
 export async function POST(request) {
   const s = session();
   if (!s) return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+
+  const account = await getUser(s.email);
+  if ((account?.accountType || "personal") !== "business") {
+    return NextResponse.json(
+      {
+        error:
+          "Only Business (creator) accounts can upload. Switch to Business in your Profile and accept the Creator Terms first."
+      },
+      { status: 403 }
+    );
+  }
 
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");

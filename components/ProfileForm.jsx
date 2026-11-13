@@ -19,6 +19,7 @@ export default function ProfileForm() {
   const [accountType, setAccountType] = useState("personal");
   const [dp, setDp] = useState("");
   const [saving, setSaving] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [msg, setMsg] = useState(null); // { ok, text }
   const [stats, setStats] = useState({ boards: 0, images: 0, favs: 0 });
   const fileRef = useRef(null);
@@ -74,7 +75,7 @@ export default function ProfileForm() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, gender, bio, dp, accountType })
+        body: JSON.stringify({ name, gender, bio, dp, accountType, creatorConsent: consent })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
@@ -137,9 +138,34 @@ export default function ProfileForm() {
           Account type
           <select value={accountType} onChange={(e) => setAccountType(e.target.value)}>
             <option value="personal">Personal</option>
-            <option value="business">Business</option>
+            <option value="business">Business (Creator)</option>
           </select>
+          <small className="field-hint">
+            Business = creator account. Required for uploading images and appearing on the
+            Creators page. Personal profiles stay private.
+          </small>
         </label>
+
+        {accountType === "business" && profile.accountType !== "business" && (
+          <div className="consent-box">
+            <strong>Creator Terms</strong>
+            <ul>
+              <li>Your name, photo, bio and uploads become publicly visible as a creator page.</li>
+              <li>You own the rights to everything you upload.</li>
+              <li>AI-generated or AI-edited images are not allowed — every upload is checked.</li>
+              <li>Every upload automatically gets your personal watermark.</li>
+              <li>OneSearch may remove content that breaks these rules.</li>
+            </ul>
+            <label className="consent-check">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+              />
+              <span>I have read and agree to the Creator Terms</span>
+            </label>
+          </div>
+        )}
 
         <label>
           Gender
@@ -165,7 +191,11 @@ export default function ProfileForm() {
 
         {msg && <p className={msg.ok ? "auth-ok" : "auth-error"}>{msg.text}</p>}
 
-        <button type="submit" className="plan-cta" disabled={saving}>
+        <button
+          type="submit"
+          className="plan-cta"
+          disabled={saving || (accountType === "business" && profile.accountType !== "business" && !consent)}
+        >
           {saving ? <span className="spinner" /> : "Save profile"}
         </button>
       </form>

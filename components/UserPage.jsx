@@ -105,16 +105,28 @@ export default function UserPage({ pageId }) {
         </div>
         <div className="page-actions">
           {isOwner ? (
-            <>
-              <button className="plan-cta" onClick={() => fileRef.current?.click()} disabled={busy}>
-                {busy ? <span className="spinner" /> : "⬆ Upload image"}
-              </button>
-              <input ref={fileRef} type="file" accept="image/*" hidden onChange={upload} />
-              <p className="upload-note">
-                Original photos only — AI images are not allowed. Uploads get your watermark
-                automatically.
-              </p>
-            </>
+            page.accountType === "business" ? (
+              <>
+                <button className="plan-cta" onClick={() => fileRef.current?.click()} disabled={busy}>
+                  {busy ? <span className="spinner" /> : "⬆ Upload image"}
+                </button>
+                <input ref={fileRef} type="file" accept="image/*" hidden onChange={upload} />
+                <p className="upload-note">
+                  Original photos only — AI images are not allowed. Uploads get your watermark
+                  automatically.
+                </p>
+              </>
+            ) : (
+              <>
+                <a className="plan-cta" href="/profile">
+                  ✦ Become a creator
+                </a>
+                <p className="upload-note">
+                  Uploading needs a Business (creator) account. Switch in your profile and accept
+                  the Creator Terms.
+                </p>
+              </>
+            )
           ) : (
             <button
               className={`plan-cta ${isFollowing ? "ghost-active" : ""}`}

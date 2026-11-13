@@ -21,7 +21,13 @@ export default function CreatorsList() {
     );
   }
 
-  if (!pages.length) return <p className="empty">No creator pages yet — be the first!</p>;
+  if (!pages.length)
+    return (
+      <p className="empty">
+        No creators yet — switch your account to Business in{" "}
+        <a href="/profile">your profile</a> and be the first!
+      </p>
+    );
 
   return (
     <div className="creators-grid">
