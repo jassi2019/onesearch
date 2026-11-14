@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getBoards, FAV_BOARD } from "../lib/boards";
 
 const GENDERS = [
@@ -12,7 +13,9 @@ const GENDERS = [
 ];
 
 export default function ProfileForm() {
+  const router = useRouter();
   const [profile, setProfile] = useState(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [bio, setBio] = useState("");
@@ -118,6 +121,15 @@ export default function ProfileForm() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const logout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    router.push("/login");
+    router.refresh();
   };
 
   if (!profile) {
@@ -307,6 +319,23 @@ export default function ProfileForm() {
           <span>Saved images</span>
           <a href="/">Search more</a>
         </div>
+        <button type="button" className="profile-logout" onClick={logout} disabled={loggingOut}>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <path d="M16 17l5-5-5-5M21 12H9" />
+          </svg>
+          {loggingOut ? "Logging out…" : "Log out"}
+        </button>
       </div>
     </div>
   );
