@@ -583,6 +583,14 @@ function Creator({ groups, preset, presetKey }) {
     appleStyle: true
   });
   const [imgTick, setImgTick] = useState(0);
+  const [brandColors, setBrandColors] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setBrandColors(d?.profile?.brandKit?.colors || []))
+      .catch(() => {});
+  }, []);
 
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
 
@@ -871,6 +879,28 @@ function Creator({ groups, preset, presetKey }) {
             🎬 Green screen
           </span>
         </span>
+        {brandColors.length > 0 && (
+          <span className="cp-row bk-swatch-row">
+            <small>💼 Brand:</small>
+            {brandColors.map((c) => (
+              <button
+                key={c}
+                type="button"
+                className="bk-swatch"
+                style={{ background: c }}
+                title={`Use ${c}`}
+                onClick={() =>
+                  setCfg((prev) => ({
+                    ...prev,
+                    color1: c,
+                    color2: brandColors.find((x) => x !== c) || c,
+                    useGrad: brandColors.length > 1
+                  }))
+                }
+              />
+            ))}
+          </span>
+        )}
 
         <label className="cp-label">
           Motion ({MOTIONS.length - 1} effects)

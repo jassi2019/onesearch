@@ -4,6 +4,7 @@ import TopNav from "../components/TopNav";
 import AnimatedTitle from "../components/AnimatedTitle";
 import Landing from "../components/Landing";
 import { verifyToken, SESSION_COOKIE } from "../lib/auth";
+import { upcomingEvents } from "../lib/trends";
 
 export default function Home() {
   const token = cookies().get(SESSION_COOKIE)?.value;
@@ -13,6 +14,8 @@ export default function Home() {
   // the search app itself stays behind login.
   if (!loggedIn) return <Landing />;
 
+  const nextEvent = upcomingEvents(45)[0];
+
   return (
     <main>
       <TopNav />
@@ -20,6 +23,13 @@ export default function Home() {
         <div className="hero-badge">✦ AI-powered image discovery</div>
         <AnimatedTitle />
         <p>Millions of free, high-quality images — one search.</p>
+        {nextEvent && (
+          <a className="trend-banner" href="/trends">
+            {nextEvent.emoji} <strong>{nextEvent.name}</strong>{" "}
+            {nextEvent.daysLeft === 0 ? "is today" : `in ${nextEvent.daysLeft} days`} — see trending
+            images →
+          </a>
+        )}
       </div>
       <div className="container">
         <SearchApp />

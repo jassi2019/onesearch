@@ -30,6 +30,34 @@ function MicIcon() {
 const ORIENTATIONS = ["any", "landscape", "portrait", "square"];
 const COLORS = ["any", "red", "orange", "yellow", "green", "blue", "black", "white", "gray"];
 
+// Map an arbitrary brand hex to the nearest provider-supported color name.
+const NAMED_RGB = {
+  red: [220, 38, 38],
+  orange: [249, 115, 22],
+  yellow: [234, 179, 8],
+  green: [34, 197, 94],
+  blue: [59, 130, 246],
+  black: [15, 15, 15],
+  white: [245, 245, 245],
+  gray: [128, 128, 128]
+};
+
+function nearestNamedColor(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  let best = "gray";
+  let bestD = Infinity;
+  for (const [name, [nr, ng, nb]] of Object.entries(NAMED_RGB)) {
+    const d = (r - nr) ** 2 + (g - ng) ** 2 + (b - nb) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = name;
+    }
+  }
+  return best;
+}
+
 export default function SearchApp() {
   const [query, setQuery] = useState("");
   const activeSources = SOURCES;
@@ -51,11 +79,23 @@ export default function SearchApp() {
   const [blockedMsg, setBlockedMsg] = useState("");
   const [emojiMatches, setEmojiMatches] = useState([]);
   const [copiedEmoji, setCopiedEmoji] = useState("");
+  const [brandColors, setBrandColors] = useState([]);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SR) setVoiceSupported(true);
+    fetch("/api/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setBrandColors(d?.profile?.brandKit?.colors || []))
+      .catch(() => {});
+    // Support /?q=... links (e.g. from the Trend Calendar)
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) {
+      setQuery(q);
+      runSearch(1, q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const runSearch = useCallback(
@@ -264,6 +304,28 @@ export default function SearchApp() {
           <option value="commercial">Commercial use ✓</option>
         </select>
       </div>
+
+      {brandColors.length > 0 && (
+        <div className="suggestions brand-row">
+          <span>💼 Brand:</span>
+          {brandColors.map((c) => {
+            const named = nearestNamedColor(c);
+            return (
+              <button
+                key={c}
+                className={`brand-dot ${color === named ? "active" : ""}`}
+                style={{ background: c }}
+                title={`Filter by brand color (${named})`}
+                onClick={() => {
+                  const next = color === named ? "any" : named;
+                  setColor(next);
+                  if (searched) runSearch(1, undefined, { color: next });
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
 
       {!searched && (
         <div className="suggestions">

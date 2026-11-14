@@ -58,6 +58,24 @@ export default function TopNav() {
         <a href="/emoji">Emoji</a>
         <a href="/creators">Creators</a>
         <a href="/collections">Collections</a>
+        <a href="/trends" className="nav-contact" title="Trend Calendar">
+          <span className="nc-text">Trends</span>
+          <svg
+            className="nc-icon"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="3" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+        </a>
         <a href="/pricing">Pricing</a>
         <a href="/contact" className="nav-contact" title="Contact us">
           <span className="nc-text">Contact</span>

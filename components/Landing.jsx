@@ -203,7 +203,8 @@ export default function Landing() {
       <footer>
         Images belong to their respective photographers and platforms. OneSearch is an aggregator —
         always follow each platform&apos;s license. · <a href="/pricing">Pricing</a> ·{" "}
-        <a href="/privacy">Privacy Policy</a> · <a href="/contact">Contact</a>
+        <a href="/trends">Trend Calendar</a> · <a href="/privacy">Privacy Policy</a> ·{" "}
+        <a href="/contact">Contact</a>
       </footer>
     </main>
   );

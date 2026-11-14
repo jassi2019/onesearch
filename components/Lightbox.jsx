@@ -15,17 +15,75 @@ const DL_PRESETS = [
   { key: "yt", label: "YouTube 1280×720" }
 ];
 
+const CAPTION_PLATFORMS = [
+  { key: "instagram", label: "Instagram" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "x", label: "X" }
+];
+
 export default function Lightbox({ images, index, onClose, onNavigate, quality = "high" }) {
   const img = images[index];
   const [menu, setMenu] = useState(null);
   const [newBoard, setNewBoard] = useState("");
   const [saved, setSaved] = useState(false);
   const [favTick, setFavTick] = useState(0);
+  const [hasLogo, setHasLogo] = useState(false);
+  const [withLogo, setWithLogo] = useState(false);
+  const [canShareFiles, setCanShareFiles] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [captions, setCaptions] = useState(null); // null | "loading" | string[]
+  const [capPlatform, setCapPlatform] = useState("instagram");
+  const [copiedCap, setCopiedCap] = useState(-1);
 
   useEffect(() => {
     setMenu(null);
     setSaved(false);
+    setCaptions(null);
+    setCopiedCap(-1);
   }, [index]);
+
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setHasLogo(Boolean(d?.profile?.brandKit?.logo)))
+      .catch(() => {});
+    try {
+      setCanShareFiles(
+        typeof navigator.canShare === "function" &&
+          navigator.canShare({ files: [new File([""], "x.jpg", { type: "image/jpeg" })] })
+      );
+    } catch {}
+  }, []);
+
+  const brandParam = withLogo && hasLogo ? "&brand=1" : "";
+
+  const shareToApps = async () => {
+    if (!img.dl) return;
+    setSharing(true);
+    try {
+      const res = await fetch(img.dls?.low || img.dl);
+      const blob = await res.blob();
+      const file = new File([blob], "onesearch-image.jpg", { type: blob.type || "image/jpeg" });
+      await navigator.share({ files: [file], title: img.alt || "Image" });
+    } catch {}
+    setSharing(false);
+    setMenu(null);
+  };
+
+  const loadCaptions = async (platform) => {
+    setCapPlatform(platform);
+    setCaptions("loading");
+    try {
+      const topic = (img.alt || "beautiful image").slice(0, 100);
+      const res = await fetch(
+        `/api/caption?q=${encodeURIComponent(topic)}&platform=${platform}`
+      );
+      const d = await res.json();
+      setCaptions(d.captions?.length ? d.captions : []);
+    } catch {
+      setCaptions([]);
+    }
+  };
 
   useEffect(() => {
     const onKey = (e) => {
@@ -139,6 +197,59 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
             {img.dl && (
               <div className="lb-menu-wrap">
                 <button
+                  className="lb-btn"
+                  onClick={() => setMenu((m) => (m === "share" ? null : "share"))}
+                >
+                  📤 Share
+                </button>
+                {menu === "share" && (
+                  <div className="card-menu share-menu">
+                    {canShareFiles && (
+                      <button onClick={shareToApps} disabled={sharing}>
+                        {sharing ? "Opening…" : "📲 Share to apps"}
+                      </button>
+                    )}
+                    <span className="menu-label">✍️ AI captions</span>
+                    <div className="cap-tabs">
+                      {CAPTION_PLATFORMS.map((p) => (
+                        <button
+                          key={p.key}
+                          className={`chip ${captions !== null && capPlatform === p.key ? "active" : ""}`}
+                          onClick={() => loadCaptions(p.key)}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                    {captions === "loading" && <p className="cap-note">Writing captions…</p>}
+                    {Array.isArray(captions) && captions.length === 0 && (
+                      <p className="cap-note">Could not write captions — try again.</p>
+                    )}
+                    {Array.isArray(captions) &&
+                      captions.map((c, i) => (
+                        <button
+                          key={i}
+                          className="cap-item"
+                          title="Click to copy"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(c);
+                              setCopiedCap(i);
+                              setTimeout(() => setCopiedCap(-1), 1200);
+                            } catch {}
+                          }}
+                        >
+                          {copiedCap === i ? "✓ Copied!" : c}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {img.dl && (
+              <div className="lb-menu-wrap">
+                <button
                   className="lb-btn primary"
                   onClick={() => setMenu((m) => (m === "dl" ? null : "dl"))}
                 >
@@ -146,13 +257,23 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
                 </button>
                 {menu === "dl" && (
                   <div className="card-menu">
+                    {hasLogo && (
+                      <label className="dl-brand-toggle">
+                        <input
+                          type="checkbox"
+                          checked={withLogo}
+                          onChange={(e) => setWithLogo(e.target.checked)}
+                        />
+                        💼 Stamp my logo
+                      </label>
+                    )}
                     <span className="menu-label">Quality</span>
                     {QUALITY_OPTS.map(
                       (q) =>
                         (img.dls?.[q.key] || img.dl) && (
                           <a
                             key={q.key}
-                            href={img.dls?.[q.key] || img.dl}
+                            href={`${img.dls?.[q.key] || img.dl}${brandParam}`}
                             onClick={() => setMenu(null)}
                           >
                             {q.label}
@@ -163,7 +284,11 @@ export default function Lightbox({ images, index, onClose, onNavigate, quality =
                     {DL_PRESETS.map((p) => {
                       const base = img.dls?.ultra || img.dls?.high || img.dl;
                       return (
-                        <a key={p.key} href={`${base}&size=${p.key}`} onClick={() => setMenu(null)}>
+                        <a
+                          key={p.key}
+                          href={`${base}&size=${p.key}${brandParam}`}
+                          onClick={() => setMenu(null)}
+                        >
                           {p.label}
                         </a>
                       );

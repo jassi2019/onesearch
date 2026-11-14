@@ -18,6 +18,9 @@ export default function ProfileForm() {
   const [bio, setBio] = useState("");
   const [accountType, setAccountType] = useState("personal");
   const [dp, setDp] = useState("");
+  const [brandLogo, setBrandLogo] = useState("");
+  const [brandColors, setBrandColors] = useState([]);
+  const logoRef = useRef(null);
   const [saving, setSaving] = useState(false);
   const [consent, setConsent] = useState(false);
   const [msg, setMsg] = useState(null); // { ok, text }
@@ -35,6 +38,8 @@ export default function ProfileForm() {
         setBio(d.profile.bio);
         setDp(d.profile.dp);
         setAccountType(d.profile.accountType || "personal");
+        setBrandLogo(d.profile.brandKit?.logo || "");
+        setBrandColors(d.profile.brandKit?.colors || []);
       })
       .catch(() => {});
 
@@ -67,6 +72,25 @@ export default function ProfileForm() {
     img.src = URL.createObjectURL(file);
   };
 
+  const pickLogo = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !file.type.startsWith("image/")) return;
+    const img = new Image();
+    img.onload = () => {
+      const max = 256;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      // PNG keeps logo transparency
+      setBrandLogo(canvas.toDataURL("image/png"));
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  };
+
   const save = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -75,7 +99,15 @@ export default function ProfileForm() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, gender, bio, dp, accountType, creatorConsent: consent })
+        body: JSON.stringify({
+          name,
+          gender,
+          bio,
+          dp,
+          accountType,
+          creatorConsent: consent,
+          brandKit: { logo: brandLogo, colors: brandColors }
+        })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
@@ -188,6 +220,60 @@ export default function ProfileForm() {
             placeholder="Tell us a little about yourself…"
           />
         </label>
+
+        <div className="brandkit">
+          <strong className="bk-title">💼 Brand Kit</strong>
+          <p className="field-hint" style={{ marginTop: 0 }}>
+            Save your logo and brand colors — use them to filter searches, stamp your logo on
+            downloads, and make on-brand buttons in Emoji Studio.
+          </p>
+          <div className="bk-logo-row">
+            {brandLogo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="bk-logo" src={brandLogo} alt="Brand logo" />
+            ) : (
+              <span className="bk-logo bk-logo-empty">Logo</span>
+            )}
+            <button type="button" className="dp-edit" onClick={() => logoRef.current?.click()}>
+              {brandLogo ? "Change logo" : "Upload logo"}
+            </button>
+            {brandLogo && (
+              <button type="button" className="dp-remove" onClick={() => setBrandLogo("")}>
+                Remove
+              </button>
+            )}
+            <input ref={logoRef} type="file" accept="image/*" hidden onChange={pickLogo} />
+          </div>
+          <div className="bk-colors">
+            {brandColors.map((c, i) => (
+              <span className="bk-color" key={i}>
+                <input
+                  type="color"
+                  value={c}
+                  onChange={(e) =>
+                    setBrandColors((prev) => prev.map((p, j) => (j === i ? e.target.value : p)))
+                  }
+                />
+                <button
+                  type="button"
+                  aria-label="Remove color"
+                  onClick={() => setBrandColors((prev) => prev.filter((_, j) => j !== i))}
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+            {brandColors.length < 4 && (
+              <button
+                type="button"
+                className="bk-add"
+                onClick={() => setBrandColors((prev) => [...prev, "#a78bfa"])}
+              >
+                + Add color
+              </button>
+            )}
+          </div>
+        </div>
 
         {msg && <p className={msg.ok ? "auth-ok" : "auth-error"}>{msg.text}</p>}
 

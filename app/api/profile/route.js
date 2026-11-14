@@ -25,6 +25,7 @@ const publicProfile = (u) => ({
   bio: u.bio || "",
   dp: u.dp || "",
   accountType: u.accountType || "personal",
+  brandKit: u.brandKit || { logo: "", colors: [] },
   pageId: pageIdFor(u.email),
   google: Boolean(u.google),
   createdAt: u.createdAt
@@ -89,6 +90,18 @@ export async function PUT(request) {
       user.creatorConsentAt = new Date().toISOString();
     }
     user.accountType = body.accountType;
+  }
+
+  if (body.brandKit !== undefined) {
+    const bk = body.brandKit || {};
+    const logo = String(bk.logo || "");
+    if (logo && (!logo.startsWith("data:image/") || logo.length > 400_000)) {
+      return NextResponse.json({ error: "Brand logo must be an image under ~300KB" }, { status: 400 });
+    }
+    const colors = Array.isArray(bk.colors)
+      ? bk.colors.filter((c) => /^#[0-9a-fA-F]{6}$/.test(String(c))).slice(0, 4)
+      : [];
+    user.brandKit = { logo, colors };
   }
 
   await saveUser(user.email, user);
