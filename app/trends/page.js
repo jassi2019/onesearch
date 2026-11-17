@@ -1,5 +1,6 @@
 import TopNav from "../../components/TopNav";
 import { upcomingEvents, EVERGREEN } from "../../lib/trends";
+import { TOPICS } from "../../lib/topics";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,20 @@ export default function TrendsPage() {
               {q}
             </a>
           ))}
+        </div>
+
+        <h2 className="landing-h2">
+          Free image <span className="grad-text">collections</span>
+        </h2>
+        <div className="seo-related">
+          {TOPICS.slice(0, 16).map((t) => (
+            <a className="chip" key={t.slug} href={`/images/${t.slug}`}>
+              {t.emoji} {t.name}
+            </a>
+          ))}
+          <a className="chip chip-more" href="/images">
+            All categories →
+          </a>
         </div>
       </div>
 
