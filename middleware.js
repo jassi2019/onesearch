@@ -5,7 +5,12 @@ const PUBLIC_PATHS = ["/", "/login", "/signup", "/privacy", "/contact", "/pricin
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api/") || PUBLIC_PATHS.includes(pathname)) {
+  if (
+    pathname.startsWith("/api/") ||
+    pathname === "/images" ||
+    pathname.startsWith("/images/") ||
+    PUBLIC_PATHS.includes(pathname)
+  ) {
     return NextResponse.next();
   }
 

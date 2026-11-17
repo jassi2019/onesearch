@@ -1,9 +1,18 @@
+import { TOPICS } from "../lib/topics";
+
 const BASE = "https://onesearch-lm.vercel.app";
 
 export default function sitemap() {
   const now = new Date();
   return [
     { url: `${BASE}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE}/images`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    ...TOPICS.map((t) => ({
+      url: `${BASE}/images/${t.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7
+    })),
     { url: `${BASE}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/trends`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },

@@ -1,4 +1,5 @@
 import AnimatedTitle from "./AnimatedTitle";
+import { TOPICS } from "../lib/topics";
 
 const FEATURES = [
   {
@@ -191,6 +192,20 @@ export default function Landing() {
           ))}
         </div>
 
+        <h2 className="landing-h2">
+          Popular <span className="grad-text">free image searches</span>
+        </h2>
+        <div className="seo-related">
+          {TOPICS.slice(0, 18).map((t) => (
+            <a className="chip" key={t.slug} href={`/images/${t.slug}`}>
+              {t.name}
+            </a>
+          ))}
+          <a className="chip chip-more" href="/images">
+            View all categories →
+          </a>
+        </div>
+
         <div className="landing-band">
           <h2>Ready to find your next image?</h2>
           <p>Join OneSearch free and search five image libraries in one place.</p>
@@ -202,9 +217,9 @@ export default function Landing() {
 
       <footer>
         Images belong to their respective photographers and platforms. OneSearch is an aggregator —
-        always follow each platform&apos;s license. · <a href="/pricing">Pricing</a> ·{" "}
-        <a href="/trends">Trend Calendar</a> · <a href="/privacy">Privacy Policy</a> ·{" "}
-        <a href="/contact">Contact</a>
+        always follow each platform&apos;s license. · <a href="/images">Free Images</a> ·{" "}
+        <a href="/pricing">Pricing</a> · <a href="/trends">Trend Calendar</a> ·{" "}
+        <a href="/privacy">Privacy Policy</a> · <a href="/contact">Contact</a>
       </footer>
     </main>
   );
