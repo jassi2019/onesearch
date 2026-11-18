@@ -7,7 +7,7 @@ const PLANS = [
     name: "Free",
     price: "₹0",
     period: "forever",
-    features: ["50 searches / day", "Standard image library", "Standard downloads", "Community support"],
+    features: ["10 searches / day", "Standard image library", "Standard downloads", "Community support"],
     cta: "Current plan",
     current: true
   },
