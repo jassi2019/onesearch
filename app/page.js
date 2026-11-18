@@ -3,6 +3,7 @@ import SearchApp from "../components/SearchApp";
 import TopNav from "../components/TopNav";
 import AnimatedTitle from "../components/AnimatedTitle";
 import Landing from "../components/Landing";
+import VideoBanner from "../components/VideoBanner";
 import { verifyToken, SESSION_COOKIE } from "../lib/auth";
 import { upcomingEvents } from "../lib/trends";
 
@@ -33,6 +34,7 @@ export default function Home() {
       </div>
       <div className="container">
         <SearchApp />
+        <VideoBanner />
       </div>
       <footer>
         Images belong to their respective photographers and platforms. OneSearch is an aggregator —

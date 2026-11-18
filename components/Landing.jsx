@@ -1,4 +1,5 @@
 import AnimatedTitle from "./AnimatedTitle";
+import VideoBanner from "./VideoBanner";
 import { TOPICS } from "../lib/topics";
 
 const FEATURES = [
@@ -191,6 +192,8 @@ export default function Landing() {
             </details>
           ))}
         </div>
+
+        <VideoBanner />
 
         <h2 className="landing-h2">
           Popular <span className="grad-text">free image searches</span>
