@@ -3598,3 +3598,15 @@ footer a:hover {
     margin-left: 74px;
   }
 }
+
+/* ===== Profile: My Collections button ===== */
+.collections-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.collections-btn:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+}

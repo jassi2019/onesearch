@@ -57,7 +57,6 @@ export default function TopNav() {
       <div className="nav-links">
         <a href="/emoji">Emoji</a>
         <a href="/creators">Creators</a>
-        <a href="/collections">Collections</a>
         <a href="/trends" className="nav-contact" title="Trend Calendar">
           <span className="nc-text">Trends</span>
           <svg

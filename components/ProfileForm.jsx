@@ -304,6 +304,9 @@ export default function ProfileForm() {
             🖼 View my page
           </a>
         )}
+        <a className="plan-cta mypage-btn collections-btn" href="/collections">
+          🗂 My Collections
+        </a>
         <div className="stat-card">
           <span className="stat-num">{stats.favs}</span>
           <span>Favourites</span>
